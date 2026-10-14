@@ -135,3 +135,11 @@ export interface AppInfo {
   version: string;
   stage: string;
 }
+
+/** Where records live and how much is stored, for the local-data panel. */
+export interface DataStatus {
+  dataDir: string;
+  defaultBackupDir: string;
+  gearCount: number;
+  evidenceCount: number;
+}
