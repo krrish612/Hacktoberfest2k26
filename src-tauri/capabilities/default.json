@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Baseline capability for the ShutterProof main window. Only core IPC is granted; filesystem, shell, and HTTP access stay closed until later stages add explicit, reviewed commands.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

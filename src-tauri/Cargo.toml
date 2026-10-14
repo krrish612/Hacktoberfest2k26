@@ -1,0 +1,26 @@
+[package]
+name = "shutterproof"
+version = "0.1.0"
+description = "ShutterProof - local-first gear passport and repair-packet tool for solo wedding photographers"
+authors = ["ShutterProof"]
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "shutterproof_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true
