@@ -39,15 +39,15 @@ interface RecordsValue {
   runningInTauri: boolean;
   select: (id: string) => void;
   refresh: () => Promise<void>;
-  createGear: (input: GearInput) => Promise<void>;
-  updateGear: (id: string, input: GearInput) => Promise<void>;
-  deleteGear: (id: string) => Promise<void>;
-  attachEvidence: (kind: EvidenceKind) => Promise<void>;
-  removeEvidence: (id: string) => Promise<void>;
-  addEvent: (input: TimelineEventInput) => Promise<void>;
-  removeEvent: (id: string) => Promise<void>;
-  backup: () => Promise<void>;
-  restore: () => Promise<void>;
+  createGear: (input: GearInput) => Promise<boolean>;
+  updateGear: (id: string, input: GearInput) => Promise<boolean>;
+  deleteGear: (id: string) => Promise<boolean>;
+  attachEvidence: (kind: EvidenceKind) => Promise<boolean>;
+  removeEvidence: (id: string) => Promise<boolean>;
+  addEvent: (input: TimelineEventInput) => Promise<boolean>;
+  removeEvent: (id: string) => Promise<boolean>;
+  backup: () => Promise<boolean>;
+  restore: () => Promise<boolean>;
   dismissNotice: () => void;
   clearError: () => void;
 }
@@ -141,13 +141,15 @@ export function RecordsProvider({ children }: { children: ReactNode }) {
     };
   }, [selectedId]);
 
-  const action = useCallback(async (label: string, task: () => Promise<string | void>) => {
+  const action = useCallback(async (label: string, task: () => Promise<string | void>): Promise<boolean> => {
     setBusy(label);
     try {
       const message = await task();
       if (typeof message === "string" && message) setNotice({ tone: "success", message });
+      return true;
     } catch (caught) {
       setNotice({ tone: "error", message: messageOf(caught) });
+      return false;
     } finally {
       setBusy(null);
     }
@@ -260,6 +262,9 @@ export function RecordsProvider({ children }: { children: ReactNode }) {
     [action, loadList],
   );
 
+  const dismissNotice = useCallback(() => setNotice(null), []);
+  const clearError = useCallback(() => setError(null), []);
+
   const value: RecordsValue = {
     gears,
     selectedId,
@@ -284,8 +289,8 @@ export function RecordsProvider({ children }: { children: ReactNode }) {
     removeEvent,
     backup,
     restore,
-    dismissNotice: () => setNotice(null),
-    clearError: () => setError(null),
+    dismissNotice,
+    clearError,
   };
 
   return <RecordsContext.Provider value={value}>{children}</RecordsContext.Provider>;
