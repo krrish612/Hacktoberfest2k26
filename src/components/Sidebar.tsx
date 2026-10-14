@@ -14,7 +14,7 @@ function iconFor(category: string): "camera" | "lens" | "flash" | "package" {
 
 interface SidebarProps {
   gears: Gear[];
-  selectedId: string;
+  selectedId: string | null;
   onSelect: (id: string) => void;
   info: AppInfo | null;
   runtime: string;
@@ -68,7 +68,7 @@ export function Sidebar({ gears, selectedId, onSelect, info, runtime }: SidebarP
           {runtime}
         </p>
         <p className="rail__version">
-          v{info?.version ?? "0.1.0"} · {info ? "desktop shell" : "preview build"}
+          v{info?.version ?? "0.1.0"}, {info ? "desktop shell" : "preview build"}
         </p>
       </div>
     </aside>

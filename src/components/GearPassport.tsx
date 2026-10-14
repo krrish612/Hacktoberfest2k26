@@ -1,4 +1,4 @@
-import type { Evidence, Gear, TimelineEvent, WarrantyView } from "../types";
+import type { Evidence, EvidenceKind, Gear, TimelineEvent, TimelineEventInput, WarrantyView } from "../types";
 import { formatMoney, maskSerial } from "../lib/format";
 import { warrantyView } from "../lib/warranty";
 import { DetailList } from "./DetailList";
@@ -22,9 +22,29 @@ interface GearPassportProps {
   gear: Gear;
   evidence: Evidence[];
   events: TimelineEvent[];
+  busy: boolean;
+  detailLoading: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+  onAttach: (kind: EvidenceKind) => void;
+  onRemoveEvidence: (id: string) => void;
+  onAddEvent: (input: TimelineEventInput) => Promise<boolean>;
+  onRemoveEvent: (id: string) => void;
 }
 
-export function GearPassport({ gear, evidence, events }: GearPassportProps) {
+export function GearPassport({
+  gear,
+  evidence,
+  events,
+  busy,
+  detailLoading,
+  onEdit,
+  onDelete,
+  onAttach,
+  onRemoveEvidence,
+  onAddEvent,
+  onRemoveEvent,
+}: GearPassportProps) {
   const view = warrantyView(gear);
 
   return (
@@ -32,7 +52,7 @@ export function GearPassport({ gear, evidence, events }: GearPassportProps) {
       <header className="identity">
         <div className="identity__main">
           <p className="identity__kicker">
-            {gear.brand}, {gear.category.toLowerCase()}
+            {gear.brand ?? "Unbranded"}, {gear.category.toLowerCase()}
           </p>
           <h2 className="identity__model">{gear.model ?? gear.name}</h2>
           <p className="identity__serial">
@@ -43,6 +63,15 @@ export function GearPassport({ gear, evidence, events }: GearPassportProps) {
         </div>
         <div className="identity__side">
           <StatusPill view={view} />
+          <div className="identity__actions">
+            <button type="button" className="btn btn--small" onClick={onEdit} disabled={busy}>
+              <Icon name="note" size={15} />
+              Edit
+            </button>
+            <button type="button" className="btn btn--small btn--quiet" onClick={onDelete} disabled={busy}>
+              Delete
+            </button>
+          </div>
           <PrepareRepairPacket gear={gear} evidence={evidence} events={events} />
         </div>
       </header>
@@ -59,8 +88,12 @@ export function GearPassport({ gear, evidence, events }: GearPassportProps) {
             />
           </Section>
 
-          <Section title="Ownership timeline" description="Purchases, services, and notes in order.">
-            <OwnershipTimeline events={events} />
+          <Section
+            title="Ownership timeline"
+            description="Purchases, services, and notes in order."
+            aside={detailLoading ? "Loading…" : undefined}
+          >
+            <OwnershipTimeline events={events} busy={busy} onAdd={onAddEvent} onRemove={onRemoveEvent} />
           </Section>
         </div>
 
@@ -69,8 +102,12 @@ export function GearPassport({ gear, evidence, events }: GearPassportProps) {
             <WarrantyPanel gear={gear} />
           </Section>
 
-          <Section title="Evidence" description="Receipts, warranty files, and serial photos.">
-            <EvidenceTray items={evidence} />
+          <Section
+            title="Evidence"
+            description="Receipts, warranty files, and serial photos."
+            aside={detailLoading ? "Loading…" : undefined}
+          >
+            <EvidenceTray items={evidence} busy={busy} onAttach={onAttach} onRemove={onRemoveEvidence} />
           </Section>
         </div>
       </div>
