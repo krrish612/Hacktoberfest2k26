@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AppShell } from "./components/AppShell";
 import { ConfirmDialog } from "./components/ConfirmDialog";
+import { ExtractDialog } from "./components/ExtractDialog";
 import { GearEditor } from "./components/GearEditor";
 import { GearPassport } from "./components/GearPassport";
 import { Icon } from "./components/Icon";
@@ -61,8 +62,15 @@ function Workspace() {
   const records = useRecords();
   const [info, setInfo] = useState<AppInfo | null>(null);
   const [editor, setEditor] = useState<Gear | "new" | null>(null);
+  const [editorPreset, setEditorPreset] = useState<Partial<GearInput> | null>(null);
   const [confirm, setConfirm] = useState<Confirm>(null);
   const [showData, setShowData] = useState(false);
+  const [reading, setReading] = useState(false);
+
+  const openEditor = (target: Gear | "new", preset: Partial<GearInput> | null = null) => {
+    setEditorPreset(preset);
+    setEditor(target);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -74,6 +82,11 @@ function Workspace() {
     };
   }, []);
 
+  const closeEditor = () => {
+    setEditor(null);
+    setEditorPreset(null);
+  };
+
   const submitEditor = async (input: GearInput) => {
     const ok =
       editor === "new"
@@ -81,7 +94,7 @@ function Workspace() {
         : editor
           ? await records.updateGear(editor.id, input)
           : false;
-    if (ok) setEditor(null);
+    if (ok) closeEditor();
   };
 
   const count = records.gears.length;
@@ -95,7 +108,7 @@ function Workspace() {
   } else if (records.error) {
     body = <ErrorState message={records.error} onRetry={records.refresh} />;
   } else if (!records.selected) {
-    body = <EmptyState onAdd={() => setEditor("new")} />;
+    body = <EmptyState onAdd={() => openEditor("new")} />;
   } else {
     body = (
       <GearPassport
@@ -104,7 +117,7 @@ function Workspace() {
         events={records.timeline}
         busy={Boolean(records.busy)}
         detailLoading={records.detailLoading}
-        onEdit={() => setEditor(records.selected)}
+        onEdit={() => openEditor(records.selected)}
         onDelete={() => setConfirm("delete")}
         onAttach={records.attachEvidence}
         onRemoveEvidence={records.removeEvidence}
@@ -129,7 +142,11 @@ function Workspace() {
               <Icon name="lock" size={15} />
               Local data
             </button>
-            <button type="button" className="btn btn--small btn--primary" onClick={() => setEditor("new")}>
+            <button type="button" className="btn btn--small" onClick={() => setReading(true)}>
+              <Icon name="receipt" size={15} />
+              Read a receipt
+            </button>
+            <button type="button" className="btn btn--small btn--primary" onClick={() => openEditor("new")}>
               <Icon name="package" size={15} />
               Add gear
             </button>
@@ -142,9 +159,21 @@ function Workspace() {
       {editor ? (
         <GearEditor
           gear={editor === "new" ? null : editor}
+          preset={editorPreset}
           busy={Boolean(records.busy)}
-          onClose={() => setEditor(null)}
+          onClose={closeEditor}
           onSubmit={submitEditor}
+        />
+      ) : null}
+
+      {reading ? (
+        <ExtractDialog
+          gearId={records.selected?.id ?? null}
+          onClose={() => setReading(false)}
+          onApply={(preset) => {
+            openEditor(records.selected ?? "new", preset);
+            setReading(false);
+          }}
         />
       ) : null}
 
