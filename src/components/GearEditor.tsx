@@ -22,22 +22,27 @@ interface FormState {
   notes: string;
 }
 
-function toForm(gear: Gear | null): FormState {
+function toForm(gear: Gear | null, preset: Partial<GearInput> | null): FormState {
   return {
-    name: gear?.name ?? "",
-    category: gear?.category ?? "Camera body",
-    brand: gear?.brand ?? "",
-    model: gear?.model ?? "",
-    serialNumber: gear?.serialNumber ?? "",
-    purchaseDate: gear?.purchaseDate ?? "",
-    purchasePrice: gear?.purchasePrice != null ? String(gear.purchasePrice) : "",
-    currency: gear?.currency ?? "USD",
-    seller: gear?.seller ?? "",
-    warrantyStart: gear?.warrantyStart ?? "",
-    warrantyEnd: gear?.warrantyEnd ?? "",
-    warrantyConfirmed: gear?.warrantyConfirmed ?? false,
-    warrantyTerms: gear?.warrantyTerms ?? "",
-    notes: gear?.notes ?? "",
+    name: preset?.name ?? gear?.name ?? "",
+    category: preset?.category ?? gear?.category ?? "Camera body",
+    brand: preset?.brand ?? gear?.brand ?? "",
+    model: preset?.model ?? gear?.model ?? "",
+    serialNumber: preset?.serialNumber ?? gear?.serialNumber ?? "",
+    purchaseDate: preset?.purchaseDate ?? gear?.purchaseDate ?? "",
+    purchasePrice:
+      preset?.purchasePrice != null
+        ? String(preset.purchasePrice)
+        : gear?.purchasePrice != null
+          ? String(gear.purchasePrice)
+          : "",
+    currency: preset?.currency ?? gear?.currency ?? "USD",
+    seller: preset?.seller ?? gear?.seller ?? "",
+    warrantyStart: preset?.warrantyStart ?? gear?.warrantyStart ?? "",
+    warrantyEnd: preset?.warrantyEnd ?? gear?.warrantyEnd ?? "",
+    warrantyConfirmed: preset?.warrantyConfirmed ?? gear?.warrantyConfirmed ?? false,
+    warrantyTerms: preset?.warrantyTerms ?? gear?.warrantyTerms ?? "",
+    notes: preset?.notes ?? gear?.notes ?? "",
   };
 }
 
@@ -79,14 +84,16 @@ function validate(form: FormState): string | null {
 
 interface GearEditorProps {
   gear: Gear | null;
+  /** Values suggested by reading a receipt. The photographer reviews them here. */
+  preset?: Partial<GearInput> | null;
   busy: boolean;
   onClose: () => void;
   onSubmit: (input: GearInput) => void;
 }
 
-export function GearEditor({ gear, busy, onClose, onSubmit }: GearEditorProps) {
+export function GearEditor({ gear, preset = null, busy, onClose, onSubmit }: GearEditorProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [form, setForm] = useState<FormState>(() => toForm(gear));
+  const [form, setForm] = useState<FormState>(() => toForm(gear, preset));
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -130,7 +137,11 @@ export function GearEditor({ gear, busy, onClose, onSubmit }: GearEditorProps) {
             <h2 id="gear-editor-title" className="sheet__title">
               {title}
             </h2>
-            <p className="sheet__subtitle">You type everything in; nothing is guessed.</p>
+            <p className="sheet__subtitle">
+              {preset
+                ? "These come from the receipt you read. Check each one, then save."
+                : "You type everything in; nothing is guessed."}
+            </p>
           </div>
           <button type="button" className="sheet__close" onClick={onClose} aria-label="Close" disabled={busy}>
             <Icon name="close" size={18} />
