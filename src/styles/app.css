@@ -1158,6 +1158,134 @@ button {
   background: var(--surface-sunken);
 }
 
+/* ---------- Stage 3: local receipt reading ---------- */
+
+.muted {
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.model__banner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--amber);
+  border-radius: var(--radius-sm);
+  background: var(--amber-tint);
+  color: var(--amber);
+  font-size: 13px;
+}
+
+.model__banner--ok {
+  border-color: var(--sage);
+  background: var(--sage-tint);
+  color: var(--sage-ink);
+}
+
+.model__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.model__row svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.model__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.model__setup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.model__command {
+  display: inline-block;
+  padding: 8px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestion {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.suggestion__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.suggestion__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-faint);
+}
+
+.suggestion__confidence {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.suggestion__value {
+  font-size: 13.5px;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.suggestion__bar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.suggestion__bar span {
+  display: block;
+  height: 100%;
+  background: var(--sage);
+}
+
+.warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  color: var(--amber);
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 640px) {
