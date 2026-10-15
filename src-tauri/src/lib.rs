@@ -1,15 +1,20 @@
 //! ShutterProof application shell.
 //!
-//! Stage 2 adds a local SQLite-backed records store. The frontend never touches
-//! the database or filesystem directly: every action goes through a validated
-//! Tauri command in `commands`.
+//! Stage 2 added a local SQLite-backed records store. Stage 3 adds private,
+//! on-device receipt reading through a local Ollama model. The frontend never
+//! touches the database, filesystem, or model directly: every action goes
+//! through a validated Tauri command in `commands`, and receipt data never
+//! leaves the machine.
 
 mod backup;
 mod commands;
 mod db;
+mod document;
 mod error;
+mod extract;
 mod files;
 mod models;
+mod ollama;
 mod state;
 mod validate;
 
@@ -42,6 +47,8 @@ pub fn run() {
             commands::records_status,
             commands::backup_records,
             commands::restore_records,
+            commands::ollama_status,
+            commands::extract_receipt,
         ])
         .run(tauri::generate_context!())
         .expect("failed to start the ShutterProof shell");
