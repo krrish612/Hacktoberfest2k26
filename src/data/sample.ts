@@ -55,7 +55,7 @@ export const gears: Gear[] = [
     seller: "B&H Photo Video",
     warrantyStart: "2026-08-30",
     warrantyEnd: "2026-10-30",
-    warrantyConfirmed: true,
+    warrantyConfirmed: false,
     warrantyTerms: "60-day store replacement cover from the seller.",
     notes: "Second light for receptions. Needs a warranty decision this month.",
     createdAt: "2026-08-30T13:48:00.000Z",
@@ -120,6 +120,14 @@ const timeline: TimelineEvent[] = [
     occurredOn: "2025-11-08",
     title: "Purchased from B&H Photo Video",
     detail: "$2,499.00. Order BH-1048237.",
+  },
+  {
+    id: "tl-r6-serial",
+    gearId: "gear-r6",
+    kind: "inspection",
+    occurredOn: "2025-11-09",
+    title: "Serial number verified",
+    detail: "Plate photographed and matched to the order.",
   },
   {
     id: "tl-r6-warranty",
