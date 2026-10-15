@@ -4,8 +4,10 @@ import type {
   DataStatus,
   Evidence,
   EvidenceKind,
+  Extraction,
   Gear,
   GearInput,
+  OllamaStatus,
   TimelineEvent,
   TimelineEventInput,
 } from "../types";
@@ -31,6 +33,8 @@ export interface RecordsApi {
   recordsStatus(): Promise<DataStatus>;
   backupRecords(destDir: string): Promise<BackupInfo>;
   restoreRecords(backupDir: string): Promise<void>;
+  ollamaStatus(): Promise<OllamaStatus>;
+  extractReceipt(sourcePath: string, gearId: string | null): Promise<Extraction>;
 }
 
 const tauriApi: RecordsApi = {
@@ -48,6 +52,8 @@ const tauriApi: RecordsApi = {
   recordsStatus: () => invoke<DataStatus>("records_status"),
   backupRecords: (destDir) => invoke<BackupInfo>("backup_records", { destDir }),
   restoreRecords: (backupDir) => invoke<void>("restore_records", { backupDir }),
+  ollamaStatus: () => invoke<OllamaStatus>("ollama_status"),
+  extractReceipt: (sourcePath, gearId) => invoke<Extraction>("extract_receipt", { sourcePath, gearId }),
 };
 
 export const runningInTauri = isTauri();

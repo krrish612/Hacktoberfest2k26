@@ -2,8 +2,10 @@ import type {
   BackupInfo,
   DataStatus,
   Evidence,
+  Extraction,
   Gear,
   GearInput,
+  OllamaStatus,
   TimelineEvent,
 } from "../types";
 import { evidenceFor, gears as sampleGears, timelineFor } from "../data/sample";
@@ -187,5 +189,19 @@ export const memoryApi: RecordsApi = {
 
   async restoreRecords(): Promise<void> {
     throw new Error("Restore runs in the ShutterProof desktop app.");
+  },
+
+  async ollamaStatus(): Promise<OllamaStatus> {
+    return {
+      available: false,
+      model: "qwen2.5vl:7b",
+      modelPresent: false,
+      version: null,
+      message: "Receipt reading runs in the ShutterProof desktop app with Ollama installed.",
+    };
+  },
+
+  async extractReceipt(): Promise<Extraction> {
+    throw new Error("Receipt reading runs in the ShutterProof desktop app.");
   },
 };

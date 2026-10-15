@@ -93,8 +93,8 @@ export interface ExtractedField {
 
 export interface Extraction {
   id: string;
-  evidenceId: string;
-  gearId: string;
+  evidenceId: string | null;
+  gearId: string | null;
   model: string;
   status: ExtractionStatus;
   fields: ExtractedField[];
