@@ -134,7 +134,7 @@ function Workspace() {
         selectedId={records.selectedId}
         onSelect={records.select}
         info={info}
-        runtime={records.runningInTauri ? "Runs on this device" : "Browser preview"}
+        runtime={records.runningInTauri ? "Stored on this device" : "Browser preview"}
         hint={hint}
         actions={
           <>
