@@ -8,10 +8,11 @@ use tauri::State;
 
 use crate::error::{AppError, AppResult};
 use crate::models::{
-    AppInfo, BackupInfo, DataStatus, Evidence, Gear, GearInput, TimelineEvent, TimelineEventInput,
+    AppInfo, BackupInfo, DataStatus, Evidence, Extraction, Gear, GearInput, OllamaStatus,
+    TimelineEvent, TimelineEventInput,
 };
 use crate::state::AppState;
-use crate::{backup, db, files, validate};
+use crate::{backup, db, document, extract, files, ollama, validate};
 
 type Shared = Arc<AppState>;
 
@@ -40,7 +41,7 @@ pub fn app_info() -> AppInfo {
     AppInfo {
         name: "ShutterProof".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
-        stage: "stage-2-records".to_string(),
+        stage: "stage-3-extraction".to_string(),
     }
 }
 
@@ -205,6 +206,50 @@ pub async fn backup_records(state: State<'_, Shared>, dest_dir: String) -> AppRe
         )
     })
     .await
+}
+
+/// Whether the local model is reachable and the chosen model is installed.
+/// Never an error: the UI needs the guidance whether or not Ollama is running.
+#[tauri::command]
+pub async fn ollama_status() -> OllamaStatus {
+    ollama::status().await
+}
+
+/// Reads a receipt with the local model and returns suggestions to review.
+/// Nothing is written to the database: the photographer accepts or corrects
+/// each value in the editor afterwards.
+#[tauri::command]
+pub async fn extract_receipt(
+    source_path: String,
+    gear_id: Option<String>,
+) -> AppResult<Extraction> {
+    let path = std::path::PathBuf::from(&source_path);
+    if !path.is_file() {
+        return Err(AppError::validation("Choose a receipt file to read."));
+    }
+
+    let loaded = tauri::async_runtime::spawn_blocking(move || document::read(&path))
+        .await
+        .map_err(|error| AppError::internal(error.to_string()))??;
+
+    let (prompt, images) = match loaded {
+        document::Document::Text(text) => (extract::prompt_for_text(&text), Vec::new()),
+        document::Document::Image { base64, .. } => (extract::prompt_for_image(), vec![base64]),
+    };
+
+    let content = ollama::chat_json(extract::SYSTEM, &prompt, &images, &extract::schema()).await?;
+    let suggestions = extract::parse(&content)?;
+
+    Ok(Extraction {
+        id: uuid::Uuid::new_v4().to_string(),
+        evidence_id: None,
+        gear_id,
+        model: ollama::model(),
+        status: "pending".to_string(),
+        fields: suggestions.fields,
+        warnings: suggestions.warnings,
+        created_at: timestamp(),
+    })
 }
 
 #[tauri::command]
