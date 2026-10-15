@@ -19,7 +19,7 @@ const MAX_TEXT_CHARS: usize = 16_000;
 /// What the model receives: a PDF's text layer, or a base64 image of a scan.
 pub enum Document {
     Text(String),
-    Image { base64: String, mime: String },
+    Image { base64: String },
 }
 
 /// Reads `path`, checks the file type by its bytes, and returns the form the
@@ -41,9 +41,8 @@ pub fn read(path: &Path) -> AppResult<Document> {
 
     match files::detect_mime(&bytes) {
         Some("application/pdf") => pdf_text(&bytes).map(Document::Text),
-        Some(mime @ ("image/jpeg" | "image/png")) => Ok(Document::Image {
+        Some("image/jpeg" | "image/png") => Ok(Document::Image {
             base64: base64::engine::general_purpose::STANDARD.encode(&bytes),
-            mime: mime.to_string(),
         }),
         _ => Err(AppError::validation(
             "Reading receipts works with PDF, JPEG, and PNG files.",

@@ -68,7 +68,9 @@ pub fn normalized_gear(input: GearInput) -> AppResult<GearInput> {
 
     if let Some(price) = input.purchase_price {
         if !price.is_finite() || price < 0.0 || price > MAX_PRICE {
-            return Err(AppError::validation("The purchase price looks out of range."));
+            return Err(AppError::validation(
+                "The purchase price looks out of range.",
+            ));
         }
     }
 
@@ -114,7 +116,9 @@ pub fn normalized_gear(input: GearInput) -> AppResult<GearInput> {
 pub fn evidence_kind(kind: &str) -> AppResult<&str> {
     match kind {
         "receipt" | "warranty" | "serial_photo" | "other" => Ok(kind),
-        _ => Err(AppError::validation("That attachment type is not supported.")),
+        _ => Err(AppError::validation(
+            "That attachment type is not supported.",
+        )),
     }
 }
 
@@ -123,7 +127,9 @@ pub fn timeline_kind(kind: &str) -> AppResult<&str> {
     match kind {
         "purchase" | "warranty_start" | "warranty_end" | "repair" | "inspection" | "transfer"
         | "note" => Ok(kind),
-        _ => Err(AppError::validation("That timeline event type is not supported.")),
+        _ => Err(AppError::validation(
+            "That timeline event type is not supported.",
+        )),
     }
 }
 

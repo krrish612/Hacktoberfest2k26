@@ -130,10 +130,23 @@ pub fn insert_gear(conn: &Connection, input: GearInput) -> AppResult<Gear> {
          warranty_terms, notes, created_at, updated_at) \
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17)",
         params![
-            id, input.name, input.category, input.brand, input.model, input.serial_number,
-            input.purchase_date, input.purchase_price, input.currency, input.seller,
-            input.warranty_start, input.warranty_end, input.warranty_confirmed as i64,
-            input.warranty_terms, input.notes, timestamp, timestamp,
+            id,
+            input.name,
+            input.category,
+            input.brand,
+            input.model,
+            input.serial_number,
+            input.purchase_date,
+            input.purchase_price,
+            input.currency,
+            input.seller,
+            input.warranty_start,
+            input.warranty_end,
+            input.warranty_confirmed as i64,
+            input.warranty_terms,
+            input.notes,
+            timestamp,
+            timestamp,
         ],
     )?;
     get_gear(conn, &id)
@@ -154,7 +167,9 @@ pub fn update_gear(conn: &Connection, id: &str, input: GearInput) -> AppResult<G
         ],
     )?;
     if changed == 0 {
-        return Err(AppError::NotFound("That gear record no longer exists.".into()));
+        return Err(AppError::NotFound(
+            "That gear record no longer exists.".into(),
+        ));
     }
     get_gear(conn, id)
 }
@@ -172,7 +187,9 @@ pub fn delete_gear(conn: &Connection, id: &str) -> AppResult<Vec<String>> {
     }
     let changed = conn.execute("DELETE FROM gear WHERE id = ?1", params![id])?;
     if changed == 0 {
-        return Err(AppError::NotFound("That gear record no longer exists.".into()));
+        return Err(AppError::NotFound(
+            "That gear record no longer exists.".into(),
+        ));
     }
     Ok(stored)
 }
@@ -234,7 +251,8 @@ pub fn delete_evidence(conn: &Connection, id: &str) -> AppResult<String> {
             |row| row.get(0),
         )
         .optional()?;
-    let stored = stored.ok_or_else(|| AppError::NotFound("That attachment was already removed.".into()))?;
+    let stored =
+        stored.ok_or_else(|| AppError::NotFound("That attachment was already removed.".into()))?;
     conn.execute("DELETE FROM evidence WHERE id = ?1", params![id])?;
     Ok(stored)
 }
@@ -310,7 +328,9 @@ pub fn insert_timeline(
 pub fn delete_timeline(conn: &Connection, id: &str) -> AppResult<()> {
     let changed = conn.execute("DELETE FROM timeline_event WHERE id = ?1", params![id])?;
     if changed == 0 {
-        return Err(AppError::NotFound("That timeline entry was already removed.".into()));
+        return Err(AppError::NotFound(
+            "That timeline entry was already removed.".into(),
+        ));
     }
     Ok(())
 }

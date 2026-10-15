@@ -52,12 +52,18 @@ pub async fn list_gear(state: State<'_, Shared>) -> AppResult<Vec<Gear>> {
 
 #[tauri::command]
 pub async fn get_gear(state: State<'_, Shared>, id: String) -> AppResult<Gear> {
-    run(&state, move |shared| shared.with_conn(|conn| db::get_gear(conn, &id))).await
+    run(&state, move |shared| {
+        shared.with_conn(|conn| db::get_gear(conn, &id))
+    })
+    .await
 }
 
 #[tauri::command]
 pub async fn create_gear(state: State<'_, Shared>, input: GearInput) -> AppResult<Gear> {
-    run(&state, move |shared| shared.with_conn(|conn| db::insert_gear(conn, input))).await
+    run(&state, move |shared| {
+        shared.with_conn(|conn| db::insert_gear(conn, input))
+    })
+    .await
 }
 
 #[tauri::command]
@@ -173,7 +179,10 @@ pub async fn create_timeline_event(
 
 #[tauri::command]
 pub async fn delete_timeline_event(state: State<'_, Shared>, id: String) -> AppResult<()> {
-    run(&state, move |shared| shared.with_conn(|conn| db::delete_timeline(conn, &id))).await
+    run(&state, move |shared| {
+        shared.with_conn(|conn| db::delete_timeline(conn, &id))
+    })
+    .await
 }
 
 #[tauri::command]

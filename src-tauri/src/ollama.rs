@@ -217,8 +217,14 @@ mod tests {
     #[test]
     fn matches_model_accepts_bare_and_tagged_names() {
         let models = vec![
-            TagModel { name: "llama3.2:latest".to_string(), model: None },
-            TagModel { name: "qwen2.5vl:7b".to_string(), model: None },
+            TagModel {
+                name: "llama3.2:latest".to_string(),
+                model: None,
+            },
+            TagModel {
+                name: "qwen2.5vl:7b".to_string(),
+                model: None,
+            },
         ];
         assert!(matches_model(&models, "qwen2.5vl:7b"));
         assert!(matches_model(&models, "qwen2.5vl"));

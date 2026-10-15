@@ -27,11 +27,20 @@ struct Signature {
 /// Identifies a supported file by its leading bytes.
 fn detect(bytes: &[u8]) -> Option<Signature> {
     if bytes.starts_with(b"%PDF-") {
-        Some(Signature { mime: "application/pdf", extension: "pdf" })
+        Some(Signature {
+            mime: "application/pdf",
+            extension: "pdf",
+        })
     } else if bytes.starts_with(&[0xFF, 0xD8, 0xFF]) {
-        Some(Signature { mime: "image/jpeg", extension: "jpg" })
+        Some(Signature {
+            mime: "image/jpeg",
+            extension: "jpg",
+        })
     } else if bytes.starts_with(&[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]) {
-        Some(Signature { mime: "image/png", extension: "png" })
+        Some(Signature {
+            mime: "image/png",
+            extension: "png",
+        })
     } else {
         None
     }
@@ -68,10 +77,17 @@ pub struct Imported {
 }
 
 /// Validates `source` and copies it into `dest_dir` under `stored_stem`.
-pub fn import_source(source: &Path, temp_dir: &Path, dest_dir: &Path, stored_stem: &str) -> AppResult<Imported> {
+pub fn import_source(
+    source: &Path,
+    temp_dir: &Path,
+    dest_dir: &Path,
+    stored_stem: &str,
+) -> AppResult<Imported> {
     let metadata = fs::metadata(source)?;
     if !metadata.is_file() {
-        return Err(AppError::validation("Choose a file to attach, not a folder."));
+        return Err(AppError::validation(
+            "Choose a file to attach, not a folder.",
+        ));
     }
 
     let mut probe = [0u8; 8];
@@ -153,7 +169,12 @@ mod tests {
     fn detects_pdf_jpeg_png() {
         assert_eq!(detect(b"%PDF-1.7").unwrap().extension, "pdf");
         assert_eq!(detect(&[0xFF, 0xD8, 0xFF, 0xE0]).unwrap().extension, "jpg");
-        assert_eq!(detect(&[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]).unwrap().extension, "png");
+        assert_eq!(
+            detect(&[0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
+                .unwrap()
+                .extension,
+            "png"
+        );
     }
 
     #[test]
