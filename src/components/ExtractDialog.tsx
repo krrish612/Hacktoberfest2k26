@@ -132,7 +132,7 @@ export function ExtractDialog({ gearId, onClose, onApply }: ExtractDialogProps) 
           <p className="muted">Reading the receipt on this device…</p>
         ) : null}
 
-        {ready && phase !== "done" ? (
+        {ready ? (
           <button type="button" className="btn btn--primary" onClick={() => void chooseAndRead()}>
             <Icon name="receipt" size={15} />
             Choose a receipt file

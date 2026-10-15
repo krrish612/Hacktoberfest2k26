@@ -117,7 +117,7 @@ function Workspace() {
         events={records.timeline}
         busy={Boolean(records.busy)}
         detailLoading={records.detailLoading}
-        onEdit={() => openEditor(records.selected)}
+        onEdit={() => records.selected && openEditor(records.selected)}
         onDelete={() => setConfirm("delete")}
         onAttach={records.attachEvidence}
         onRemoveEvidence={records.removeEvidence}
