@@ -37,6 +37,12 @@ fn detect(bytes: &[u8]) -> Option<Signature> {
     }
 }
 
+/// The MIME type of a supported file, or `None` for anything unrecognised.
+/// Shared with the extraction pipeline so both agree on what a file is.
+pub fn detect_mime(bytes: &[u8]) -> Option<&'static str> {
+    detect(bytes).map(|signature| signature.mime)
+}
+
 /// Removes leftover `.part` files from an interrupted import.
 pub fn sweep_temp(temp_dir: &Path) {
     let Ok(entries) = fs::read_dir(temp_dir) else {
