@@ -4,12 +4,14 @@ import { isTauri } from "./tauri";
 const EVIDENCE_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"];
 
 /** Opens the native picker for a receipt, warranty, or serial photo. */
-export async function pickEvidenceFile(): Promise<string | null> {
+export async function pickEvidenceFile(
+  title = "Attach a receipt, warranty, or serial photo",
+): Promise<string | null> {
   if (!isTauri()) return null;
   const selected = await open({
     multiple: false,
     directory: false,
-    title: "Attach a receipt, warranty, or serial photo",
+    title,
     filters: [{ name: "Receipts and warranties", extensions: EVIDENCE_EXTENSIONS }],
   });
   return typeof selected === "string" ? selected : null;
