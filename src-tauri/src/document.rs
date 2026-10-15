@@ -25,6 +25,13 @@ pub enum Document {
 /// Reads `path`, checks the file type by its bytes, and returns the form the
 /// model should receive. Errors are worded for the photographer.
 pub fn read(path: &Path) -> AppResult<Document> {
+    let size = fs::metadata(path)?.len();
+    if size > MAX_EVIDENCE_BYTES {
+        return Err(AppError::validation(
+            "That file is bigger than the 25 MB receipt limit.",
+        ));
+    }
+
     let bytes = fs::read(path)?;
     if bytes.len() as u64 > MAX_EVIDENCE_BYTES {
         return Err(AppError::validation(
