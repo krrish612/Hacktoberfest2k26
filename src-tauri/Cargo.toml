@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "ShutterProof - local-first gear passport and repair-packet tool for solo wedding photographers"
 authors = ["ShutterProof"]
 edition = "2021"
-rust-version = "1.77.2"
+rust-version = "1.85.0"
 
 [lib]
 name = "shutterproof_lib"
@@ -24,6 +24,12 @@ uuid = { version = "1", features = ["v4"] }
 sha2 = "0.10"
 hex = "0.4"
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+# Stage 3: talk to a local Ollama server and read receipt documents.
+# reqwest is built without TLS and only ever pointed at 127.0.0.1, so no
+# certificates or native TLS stacks are pulled in.
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
+base64 = "0.22"
+pdf-extract = "0.9"
 
 [profile.release]
 codegen-units = 1

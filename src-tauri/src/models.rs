@@ -105,3 +105,42 @@ pub struct AppInfo {
     pub version: String,
     pub stage: String,
 }
+
+/// Whether the local Ollama server is reachable and the chosen model is pulled.
+/// This is only ever checked against 127.0.0.1; nothing leaves the device.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OllamaStatus {
+    pub available: bool,
+    pub model: String,
+    pub model_present: bool,
+    pub version: Option<String>,
+    pub message: String,
+}
+
+/// One field the model read off a receipt, with its own confidence. A suggestion
+/// only: the photographer confirms or corrects it before it is saved.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExtractedField {
+    pub key: String,
+    pub label: String,
+    pub value: String,
+    pub confidence: f64,
+    pub evidence_quote: Option<String>,
+}
+
+/// The full set of suggestions for one receipt. `status` stays `pending` here;
+/// accepting or rejecting happens in the UI when the record is edited.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Extraction {
+    pub id: String,
+    pub evidence_id: Option<String>,
+    pub gear_id: Option<String>,
+    pub model: String,
+    pub status: String,
+    pub fields: Vec<ExtractedField>,
+    pub warnings: Vec<String>,
+    pub created_at: String,
+}
