@@ -171,7 +171,7 @@ export function warrantyView(gear: Gear, now: Date = new Date()): WarrantyView {
 - `OwnershipTimeline.tsx` - the milestone list.
 - `EvidenceTray.tsx` - attached files.
 - `PrepareRepairPacket.tsx` - reviews and exports the repair packet: pick files
-  and history, opt in to the full serial, and save a zip.
+  and history, preview the full serial only after opting in, and save a zip.
 - `ExtractDialog.tsx` - runs receipt reading and shows suggestions for review.
 - `LocalDataPanel.tsx` - shows where data lives and backup actions.
 - `Section.tsx`, `DetailList.tsx`, `Icon.tsx` - small shared pieces.
@@ -234,6 +234,8 @@ let mut stmt = conn.prepare("select id, name from gear where id = ?1")?;
 - key detail: `MAX_PACKET_BYTES` caps a packet. Evidence paths reject unsafe
   names and symlinks, then resolve canonically inside the evidence directory;
   packet temp files use unique names and are atomically renamed into place.
+  Missing and oversized selected files stop export with a named message; event
+  details appear HTML-escaped in the report.
 
 **`src-tauri/src/document.rs`**
 - what: extracts text from pdf files before any read.
@@ -393,7 +395,8 @@ const packet = await invoke("export_repair_packet", {
 `export_repair_packet` writes a zip holding `repair-summary.html` and an
 `evidence/` folder. it accepts only records owned by `gearId`, keeps the serial
 number masked unless `includeSerial` is true, and writes to a temporary file
-before the final archive.
+before the final archive. The review shows the full serial only after opting in;
+missing or oversized evidence stops export with a message naming the file.
 
 checking whether the model is ready (rust side):
 

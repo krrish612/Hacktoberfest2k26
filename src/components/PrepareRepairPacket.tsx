@@ -198,7 +198,11 @@ export function PrepareRepairPacket({ gear, evidence, events }: PrepareRepairPac
                   </li>
                   <li>
                     <span>Serial</span>
-                    <span className="mono">{maskSerial(gear.serialNumber)}</span>
+                    <span className="mono">
+                      {includeSerial && gear.serialNumber
+                        ? gear.serialNumber
+                        : maskSerial(gear.serialNumber)}
+                    </span>
                   </li>
                 </ul>
                 {gear.serialNumber ? (

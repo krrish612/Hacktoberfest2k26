@@ -145,7 +145,8 @@ The **Prepare repair packet** flow writes a single ZIP to a location you pick. I
 holds a readable `repair-summary.html` report plus an `evidence/` folder with
 copies of the files you selected. Stored originals are read-only inputs; the
 packet never changes or removes them. A packet is capped at 200 MB so a large
-selection cannot produce an unshareable file.
+selection cannot produce an unshareable file. If a selected file is missing or
+over the size limit, export stops and names the file so you can fix the selection.
 
 ## Release and packaging
 
