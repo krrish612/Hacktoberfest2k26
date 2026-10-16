@@ -6,6 +6,7 @@ import type {
   Gear,
   GearInput,
   OllamaStatus,
+  PacketInfo,
   TimelineEvent,
 } from "../types";
 import { evidenceFor, gears as sampleGears, timelineFor } from "../data/sample";
@@ -189,6 +190,10 @@ export const memoryApi: RecordsApi = {
 
   async restoreRecords(): Promise<void> {
     throw new Error("Restore runs in the ShutterProof desktop app.");
+  },
+
+  async exportRepairPacket(): Promise<PacketInfo> {
+    throw new Error("Saving a repair packet runs in the ShutterProof desktop app.");
   },
 
   async ollamaStatus(): Promise<OllamaStatus> {

@@ -98,6 +98,17 @@ pub struct DataStatus {
     pub evidence_count: i64,
 }
 
+/// The result of writing a repair packet: where it landed and how big it is.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PacketInfo {
+    pub path: String,
+    pub byte_size: i64,
+    pub file_count: i64,
+    pub included_serial: bool,
+    pub created_at: String,
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AppInfo {

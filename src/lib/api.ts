@@ -8,6 +8,7 @@ import type {
   Gear,
   GearInput,
   OllamaStatus,
+  PacketInfo,
   TimelineEvent,
   TimelineEventInput,
 } from "../types";
@@ -33,6 +34,13 @@ export interface RecordsApi {
   recordsStatus(): Promise<DataStatus>;
   backupRecords(destDir: string): Promise<BackupInfo>;
   restoreRecords(backupDir: string): Promise<void>;
+  exportRepairPacket(
+    gearId: string,
+    evidenceIds: string[],
+    eventIds: string[],
+    includeSerial: boolean,
+    destPath: string,
+  ): Promise<PacketInfo>;
   ollamaStatus(): Promise<OllamaStatus>;
   extractReceipt(sourcePath: string, gearId: string | null): Promise<Extraction>;
 }
@@ -52,6 +60,14 @@ const tauriApi: RecordsApi = {
   recordsStatus: () => invoke<DataStatus>("records_status"),
   backupRecords: (destDir) => invoke<BackupInfo>("backup_records", { destDir }),
   restoreRecords: (backupDir) => invoke<void>("restore_records", { backupDir }),
+  exportRepairPacket: (gearId, evidenceIds, eventIds, includeSerial, destPath) =>
+    invoke<PacketInfo>("export_repair_packet", {
+      gearId,
+      evidenceIds,
+      eventIds,
+      includeSerial,
+      destPath,
+    }),
   ollamaStatus: () => invoke<OllamaStatus>("ollama_status"),
   extractReceipt: (sourcePath, gearId) => invoke<Extraction>("extract_receipt", { sourcePath, gearId }),
 };

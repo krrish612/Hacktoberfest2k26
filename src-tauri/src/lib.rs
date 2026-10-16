@@ -6,6 +6,7 @@
 //! through a validated Tauri command in `commands`, and receipt data never
 //! leaves the machine.
 
+mod archive;
 mod backup;
 mod commands;
 mod db;
@@ -15,6 +16,7 @@ mod extract;
 mod files;
 mod models;
 mod ollama;
+mod packet;
 mod state;
 mod validate;
 
@@ -47,6 +49,7 @@ pub fn run() {
             commands::records_status,
             commands::backup_records,
             commands::restore_records,
+            commands::export_repair_packet,
             commands::ollama_status,
             commands::extract_receipt,
         ])

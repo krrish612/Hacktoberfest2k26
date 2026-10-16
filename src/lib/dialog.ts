@@ -1,4 +1,4 @@
-import { open } from "@tauri-apps/plugin-dialog";
+import { open, save } from "@tauri-apps/plugin-dialog";
 import { isTauri } from "./tauri";
 
 const EVIDENCE_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"];
@@ -21,5 +21,19 @@ export async function pickEvidenceFile(
 export async function pickFolder(title: string): Promise<string | null> {
   if (!isTauri()) return null;
   const selected = await open({ multiple: false, directory: true, title });
+  return typeof selected === "string" ? selected : null;
+}
+
+/** Opens the native save dialog for a repair packet and returns the chosen path. */
+export async function pickSaveZip(
+  defaultName: string,
+  title = "Save repair packet",
+): Promise<string | null> {
+  if (!isTauri()) return null;
+  const selected = await save({
+    title,
+    defaultPath: defaultName,
+    filters: [{ name: "Zip archive", extensions: ["zip"] }],
+  });
   return typeof selected === "string" ? selected : null;
 }

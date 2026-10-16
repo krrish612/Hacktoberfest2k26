@@ -17,7 +17,7 @@ yourself.
 - **Stage 3 (current)** — read a receipt on this device with a local Ollama
   model and turn it into suggested fields you review before saving.
 
-Still to come: repair-packet export and printing, and a signed Windows release.
+Still to come: printing, and a signed Windows release.
 
 ## What you can do today
 
@@ -31,6 +31,11 @@ Still to come: repair-packet export and printing, and a signed Windows release.
   seller, purchase date, item, price, currency, serial number, and any warranty
   wording it can see. Each suggestion carries its own confidence and any warnings;
   you review and correct them in the editor before anything is saved.
+- **Export a repair packet**: review the gear summary, purchase and warranty
+  details, and the timeline and files you choose, then save everything as a
+  single ZIP (`repair-summary.html` plus an `evidence/` folder) wherever you pick.
+  The full serial number is left out unless you opt in, and the originals are
+  copied, never moved or deleted.
 - Back up the database and every original into a plain folder, and restore it.
 
 ## Privacy model
@@ -43,6 +48,8 @@ Still to come: repair-packet export and printing, and a signed Windows release.
   database: every action goes through a validated Rust (Tauri) command.
 - Warranty dates are **never** filled in automatically. The model is instructed
   not to infer dates, and you enter and confirm them yourself.
+- Repair-packet export runs entirely on this device. The ZIP is written straight
+  to the file you choose, and nothing is uploaded.
 
 ## Stack
 
@@ -134,6 +141,12 @@ The **Local data** panel backs up the database and every original into a plain
 folder you choose, and restores that folder in place (the previous store is kept
 aside as `.previous`). Backups are ordinary folders you can move to another drive.
 
+The **Prepare repair packet** flow writes a single ZIP to a location you pick. It
+holds a readable `repair-summary.html` report plus an `evidence/` folder with
+copies of the files you selected. Stored originals are read-only inputs; the
+packet never changes or removes them. A packet is capped at 200 MB so a large
+selection cannot produce an unshareable file.
+
 ## Release and packaging
 
 `npm run tauri:build` produces unsigned installers (`nsis` and `msi`) in
@@ -148,12 +161,16 @@ release. It performs no signing and needs no secrets.
 ## Verification status
 
 - `npm run typecheck` and `npm run build` (frontend) pass.
-- The Rust/Tauri side is **uncompiled on this machine**: the Rust toolchain and
-  MSVC Build Tools are not installed here, so `cargo`, `tauri build`, and the
-  desktop app have not been verified. Install the prerequisites above to build it.
+- The Rust/Tauri side compiles here: `cargo fmt --check`, `cargo clippy ... -D
+  warnings`, and `cargo test` pass, and `npm run tauri:build` produces the
+  unsigned `nsis` and `msi` bundles. The interactive desktop UI has not been
+  driven end to end.
 - `npm run lint` is declared but ESLint is not configured yet.
 - Receipt reading has not been exercised against a live Ollama model in this
   environment.
+- Repair-packet export is covered by unit tests (HTML escaping, serial-number
+  opt-in, evidence ownership, and ZIP contents); saving through the native dialog
+  has not been exercised interactively.
 
 ## Limitations
 
@@ -163,7 +180,7 @@ release. It performs no signing and needs no secrets.
   vision model). Quality depends on that model and the photo.
 - Suggestions are never auto-applied: you confirm every value, and warranty dates
   are always manual.
-- No repair-packet export or printing yet.
+- No printing yet; the packet is a ZIP you can print from your usual tools.
 - No accounts, sync, telemetry, or cloud features — by design.
 
 ## Project layout
@@ -196,6 +213,8 @@ src-tauri/
     db.rs                  Schema and parameterized repositories
     files.rs               Signature checks and atomic file import
     backup.rs              Folder backup and staged restore
+    archive.rs             Dependency-free ZIP writer (stored entries + CRC-32)
+    packet.rs              Repair-packet report, file assembly, and safety checks
     state.rs               App state: db handle and private paths
     ollama.rs              Local-only Ollama client (status + chat)
     document.rs            Reads a receipt PDF text layer or image bytes
@@ -222,3 +241,6 @@ are always masked to the last four characters.
 - Rust crates used: `tauri`, `rusqlite` (bundled SQLite, public domain),
   `reqwest`, `base64`, `serde`, `serde_json`, `thiserror`, `uuid`, `sha2`, `hex`,
   `chrono`.
+- The repair-packet ZIP writer is **dependency-free** (`src-tauri/src/archive.rs`):
+  it writes stored entries and a CRC-32 itself rather than pulling in an archive
+  crate, so the feature adds no third-party license and no new dependency.

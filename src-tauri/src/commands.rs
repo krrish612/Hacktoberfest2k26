@@ -9,10 +9,10 @@ use tauri::State;
 use crate::error::{AppError, AppResult};
 use crate::models::{
     AppInfo, BackupInfo, DataStatus, Evidence, Extraction, Gear, GearInput, OllamaStatus,
-    TimelineEvent, TimelineEventInput,
+    PacketInfo, TimelineEvent, TimelineEventInput,
 };
 use crate::state::AppState;
-use crate::{backup, db, document, extract, files, ollama, validate};
+use crate::{backup, db, document, extract, files, ollama, packet, validate};
 
 type Shared = Arc<AppState>;
 
@@ -259,6 +259,67 @@ pub async fn extract_receipt(
         warnings: suggestions.warnings,
         created_at: timestamp(),
     })
+}
+
+/// Writes the chosen evidence and history into a single ZIP at `dest_path`.
+///
+/// Only records that belong to `gear_id` are accepted: a selection is resolved
+/// against that gear's own evidence and timeline, so no other record's files can
+/// be pulled in. The report escapes every value and shows the serial number only
+/// when `include_serial` is set.
+#[tauri::command]
+pub async fn export_repair_packet(
+    state: State<'_, Shared>,
+    gear_id: String,
+    evidence_ids: Vec<String>,
+    event_ids: Vec<String>,
+    include_serial: bool,
+    dest_path: String,
+) -> AppResult<PacketInfo> {
+    run(&state, move |shared| {
+        let gear = shared.with_conn(|conn| db::get_gear(conn, &gear_id))?;
+
+        let owned_evidence = shared.with_conn(|conn| db::list_evidence(conn, &gear_id))?;
+        let selected_evidence = packet::select_owned(
+            &owned_evidence,
+            &evidence_ids,
+            |item| item.id.as_str(),
+            "One of the selected files is no longer available.",
+        )?;
+
+        let owned_events = shared.with_conn(|conn| db::list_timeline(conn, &gear_id))?;
+        let selected_events = packet::select_owned(
+            &owned_events,
+            &event_ids,
+            |event| event.id.as_str(),
+            "One of the selected history entries is no longer available.",
+        )?;
+
+        if selected_evidence.is_empty() && selected_events.is_empty() {
+            return Err(AppError::validation(
+                "Select at least one file or history entry for the packet.",
+            ));
+        }
+
+        let dest = packet::destination(&dest_path)?;
+        let byte_size = packet::write_packet(
+            &shared.evidence_dir,
+            &gear,
+            &selected_events,
+            &selected_evidence,
+            include_serial,
+            &dest,
+        )?;
+
+        Ok(PacketInfo {
+            path: dest.to_string_lossy().to_string(),
+            byte_size,
+            file_count: selected_evidence.len() as i64,
+            included_serial: include_serial,
+            created_at: timestamp(),
+        })
+    })
+    .await
 }
 
 #[tauri::command]

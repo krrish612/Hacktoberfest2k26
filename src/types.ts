@@ -108,6 +108,15 @@ export interface BackupInfo {
   createdAt: string;
 }
 
+/** The saved repair packet returned by the Rust `export_repair_packet` command. */
+export interface PacketInfo {
+  path: string;
+  byteSize: number;
+  fileCount: number;
+  includedSerial: boolean;
+  createdAt: string;
+}
+
 export interface OllamaStatus {
   available: boolean;
   model: string;

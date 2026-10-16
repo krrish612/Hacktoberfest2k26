@@ -21,7 +21,8 @@ what it does:
 - keeps a warranty status that is only ever shown from confirmed data.
 - stores evidence files (receipts, photos, screenshots) against a gear item.
 - keeps an ownership timeline of important milestones.
-- prepares a repair packet that a photographer can send with an item.
+- prepares and exports a repair packet (a zip) that a photographer can send with
+  an item.
 - reads a receipt image or pdf with a local model to suggest field values.
 
 core principle: everything stays on the device. there is no cloud, no account,
@@ -84,6 +85,8 @@ shutterproof/
       db.rs                  sqlite open + migrations
       files.rs               evidence file storage on disk
       backup.rs              backup create/restore
+      archive.rs             dependency-free zip writer
+      packet.rs              repair-packet report and archive assembly
       document.rs            reads text out of pdf files
       extract.rs             builds extraction suggestions
       ollama.rs              talks to local ollama
@@ -167,7 +170,8 @@ export function warrantyView(gear: Gear, now: Date = new Date()): WarrantyView {
 - `WarrantyPanel.tsx` - shows warranty status.
 - `OwnershipTimeline.tsx` - the milestone list.
 - `EvidenceTray.tsx` - attached files.
-- `PrepareRepairPacket.tsx` - assembles the repair packet.
+- `PrepareRepairPacket.tsx` - reviews and exports the repair packet: pick files
+  and history, opt in to the full serial, and save a zip.
 - `ExtractDialog.tsx` - runs receipt reading and shows suggestions for review.
 - `LocalDataPanel.tsx` - shows where data lives and backup actions.
 - `Section.tsx`, `DetailList.tsx`, `Icon.tsx` - small shared pieces.
@@ -184,9 +188,12 @@ export function warrantyView(gear: Gear, now: Date = new Date()): WarrantyView {
 
 **`src-tauri/src/commands.rs`**
 - what: the tauri command handlers the front end invokes, e.g. `app_info`,
-  `ollama_status`, `extract_receipt`, and the record commands.
+  `ollama_status`, `extract_receipt`, `export_repair_packet`, and the record
+  commands.
 - why: commands stay thin. they validate, call into a module, and return a
   result. the real work lives in the modules below.
+- key detail: `export_repair_packet` loads only the records that belong to the
+  requested gear, so a selection cannot pull in another gear's files.
 
 **`src-tauri/src/db.rs`**
 - what: opens the sqlite database and runs migrations.
@@ -207,6 +214,24 @@ let mut stmt = conn.prepare("select id, name from gear where id = ?1")?;
 - what: creates and restores backups of the app data.
 - why: a local app still needs a safety net. backups are simple copies, so a
   user can always recover their records.
+
+**`src-tauri/src/archive.rs`**
+- what: a tiny, dependency-free zip writer (stored entries only) with its own
+  crc-32.
+- why: a packet only holds an html report and already-compressed files, so a full
+  archive crate was not needed. keeping the writer in-repo avoids a new
+  dependency and its license.
+- key detail: entry names are validated (no `..`, no separators, no leading
+  slash) so nothing can escape the archive.
+
+**`src-tauri/src/packet.rs`**
+- what: builds the repair-packet report and the zip. it escapes every record
+  value for html, masks the serial number unless the photographer opts in, and
+  copies evidence files verbatim.
+- why: keeping all packet logic in one place makes the safety rules (ownership,
+  html escaping, path containment, size cap) easy to audit and test.
+- key detail: `MAX_PACKET_BYTES` caps a packet, and a stored file name is only
+  rejoined onto the evidence directory after separators and `..` are rejected.
 
 **`src-tauri/src/document.rs`**
 - what: extracts text from pdf files before any read.
@@ -352,7 +377,21 @@ const status = await invoke("ollama_status");
 
 const extraction = await invoke("extract_receipt", { evidenceId });
 // { id, status: "pending", fields: [...], warnings: [...] }
+
+const packet = await invoke("export_repair_packet", {
+  gearId,
+  evidenceIds,
+  eventIds,
+  includeSerial: false,
+  destPath, // chosen with the native save dialog
+});
+// { path, byteSize, fileCount, includedSerial, createdAt }
 ```
+
+`export_repair_packet` writes a zip holding `repair-summary.html` and an
+`evidence/` folder. it accepts only records owned by `gearId`, keeps the serial
+number masked unless `includeSerial` is true, and writes to a temporary file
+before the final archive.
 
 checking whether the model is ready (rust side):
 
