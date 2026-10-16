@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ShutterProof — gear passport for wedding photographers</title>
+    <meta
+      name="description"
+      content="ShutterProof keeps a wedding photographer's gear records, proof of purchase and warranty details on the machine, so a repair packet is ready when equipment needs service."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+
+    <header class="topbar" id="topbar">
+      <a class="brand" href="#top">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__name">ShutterProof</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="#features"><span class="nav__num">01</span>Features</a>
+        <a href="#privacy"><span class="nav__num">02</span>Privacy</a>
+        <a href="#how"><span class="nav__num">03</span>How it works</a>
+        <a href="#download"><span class="nav__num">04</span>Download</a>
+      </nav>
+      <a class="topbar__cta" href="#download">Get the app</a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero__meta reveal">
+          <span>(Gear passport / ©<span data-year>2026</span>)</span>
+          <span>Windows · local-first</span>
+        </div>
+
+        <h1 class="display reveal" data-delay="1">
+          Shutter<span class="display__thin">Proof</span>
+        </h1>
+
+        <div class="hero__row">
+          <p class="hero__lede reveal" data-delay="2">
+            I keep a wedding photographer's gear, receipts and warranty details
+            together — on your machine, not someone's cloud. So when a lens needs
+            service, the repair packet is already written.
+          </p>
+          <div class="hero__aside reveal" data-delay="3">
+            <span class="label">(Local-first desktop app)</span>
+            <span class="label">No accounts · No telemetry</span>
+          </div>
+        </div>
+
+        <div class="hero__actions reveal" data-delay="4">
+          <a class="btn btn--solid" href="#download">Get ShutterProof <span aria-hidden="true">→</span></a>
+          <a class="btn btn--ghost" href="#features">See what it does</a>
+        </div>
+
+        <p class="scroll-hint reveal" data-delay="5">↓ scroll, gently</p>
+      </section>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track" data-marquee>
+          <span>Gear passport</span><span class="dot">·</span>
+          <span>Warranty</span><span class="dot">·</span>
+          <span>Receipts</span><span class="dot">·</span>
+          <span>Serial numbers</span><span class="dot">·</span>
+          <span>Service history</span><span class="dot">·</span>
+          <span>Repair packet</span><span class="dot">·</span>
+          <span>Local model</span><span class="dot">·</span>
+          <span>Backups</span><span class="dot">·</span>
+        </div>
+      </div>
+
+      <section class="section" id="features">
+        <div class="section__head reveal">
+          <span class="label">(Selected features 04)</span>
+          <span class="label">2026</span>
+        </div>
+
+        <div class="cards">
+          <article class="card reveal" data-delay="1">
+            <span class="card__num">01</span>
+            <h2 class="card__title">Gear passport</h2>
+            <p class="card__body">
+              One record per body, lens or flash. Make, model, category, a masked
+              serial, purchase details and warranty — the whole identity of a piece
+              of kit in a single page.
+            </p>
+            <span class="card__tag">Records</span>
+          </article>
+
+          <article class="card reveal" data-delay="2">
+            <span class="card__num">02</span>
+            <h2 class="card__title">Read a receipt</h2>
+            <p class="card__body">
+              Pick a PDF, JPEG or PNG. A model running on your own machine suggests
+              the seller, date, item, price and serial. Every value arrives as a
+              suggestion you review before it is saved.
+            </p>
+            <span class="card__tag">Local AI</span>
+          </article>
+
+          <article class="card reveal" data-delay="3">
+            <span class="card__num">03</span>
+            <h2 class="card__title">Evidence &amp; timeline</h2>
+            <p class="card__body">
+              Attach the receipt, the warranty document and a photo of the serial.
+              Keep a timeline of purchase, inspections, repairs and transfers so the
+              story of the gear stays in order.
+            </p>
+            <span class="card__tag">Proof</span>
+          </article>
+
+          <article class="card reveal" data-delay="4">
+            <span class="card__num">04</span>
+            <h2 class="card__title">Back up &amp; restore</h2>
+            <p class="card__body">
+              Copy the database and every original into a plain folder you choose.
+              Ordinary files you can move to another drive, not a locked-in vault.
+            </p>
+            <span class="card__tag">Safety</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="statement">
+        <p class="statement__text reveal">
+          Everything stays on the machine. No accounts, no cloud, no telemetry —
+          and no network calls except to a <em>local</em> model server you run
+          yourself.
+        </p>
+      </section>
+
+      <section class="section" id="how">
+        <div class="section__head reveal">
+          <span class="label">(Up close)</span>
+          <span class="label">Read a receipt</span>
+        </div>
+
+        <div class="steps">
+          <div class="step reveal" data-delay="1">
+            <span class="step__num">01 →</span>
+            <h3>Install the model</h3>
+            <p>
+              Pull a small vision model once with Ollama. It runs on your computer,
+              on <code>127.0.0.1</code>. Nothing is sent anywhere else.
+            </p>
+          </div>
+          <div class="step reveal" data-delay="2">
+            <span class="step__num">02 →</span>
+            <h3>Choose a receipt</h3>
+            <p>
+              The app checks the local model first and tells you exactly what is
+              missing if it is not ready. Then it reads the file.
+            </p>
+          </div>
+          <div class="step reveal" data-delay="3">
+            <span class="step__num">03 →</span>
+            <h3>Review, then save</h3>
+            <p>
+              Each field shows a confidence bar in plain words — “Looks clear”,
+              “Check this”, “Unsure”. Nothing saves until you say so.
+            </p>
+          </div>
+          <div class="step reveal" data-delay="4">
+            <span class="step__num">04 →</span>
+            <h3>Send the packet</h3>
+            <p>
+              Purchase proof, warranty terms and the serial photo, gathered against
+              one piece of kit, ready for a repair.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="privacy">
+        <div class="section__head reveal">
+          <span class="label">(Privacy model)</span>
+          <span class="label">By design</span>
+        </div>
+
+        <div class="privacy">
+          <h2 class="privacy__title reveal">
+            Your gear, your warranty,<br />your receipts. Your machine.
+          </h2>
+          <ul class="privacy__list">
+            <li class="reveal" data-delay="1">
+              <span class="label">01</span>
+              <p>
+                Records and originals live in the app's private data directory on
+                this device.
+              </p>
+            </li>
+            <li class="reveal" data-delay="2">
+              <span class="label">02</span>
+              <p>
+                Receipt reading uses a model on <code>127.0.0.1</code> only — never a
+                remote service.
+              </p>
+            </li>
+            <li class="reveal" data-delay="3">
+              <span class="label">03</span>
+              <p>
+                The interface never touches your files or database directly. Every
+                action goes through a validated command.
+              </p>
+            </li>
+            <li class="reveal" data-delay="4">
+              <span class="label">04</span>
+              <p>
+                Warranty dates are never filled in automatically. You enter and
+                confirm them yourself.
+              </p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="cta" id="download">
+        <div class="cta__inner reveal">
+          <span class="label">(Download)</span>
+          <h2 class="cta__title">Ready when the kit needs fixing.</h2>
+          <p class="cta__text">
+            ShutterProof is a local-first Windows app. Installers are unsigned, so
+            Windows SmartScreen will warn on first run.
+          </p>
+          <div class="hero__actions">
+            <a class="btn btn--solid" href="#">Download for Windows <span aria-hidden="true">→</span></a>
+            <a class="btn btn--ghost" href="#top">Read the notes</a>
+          </div>
+        </div>
+        <p class="cta__scroll reveal">ShutterProof · ShutterProof · ShutterProof</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__cols">
+        <div class="footer__col">
+          <span class="label">(Say hello)</span>
+          <a href="mailto:hello@shutterproof.app">hello@shutterproof.app</a>
+        </div>
+        <div class="footer__col">
+          <span class="label">(Where)</span>
+          <span>Windows · local-first</span>
+        </div>
+        <div class="footer__col">
+          <span class="label">(Pages)</span>
+          <div class="footer__links">
+            <a href="#features">Features</a>
+            <a href="#privacy">Privacy</a>
+            <a href="#how">How it works</a>
+            <a href="#download">Download</a>
+          </div>
+        </div>
+        <div class="footer__col">
+          <span class="label">(Cookies)</span>
+          <p class="footer__note">
+            This site tracks nothing by default. No analytics unless you opt in.
+          </p>
+        </div>
+      </div>
+
+      <div class="footer__big" aria-hidden="true">ShutterProof</div>
+
+      <div class="footer__base">
+        <span>© <span data-year>2026</span> ShutterProof</span>
+        <a href="#top">Back to top ↑</a>
+      </div>
+    </footer>
+
+    <div class="cookie" id="cookie" hidden>
+      <p>
+        <span class="label">(Cookies)</span> This site uses no analytics. Just the
+        essentials to show the page.
+      </p>
+      <div class="cookie__actions">
+        <button type="button" data-cookie="decline">Decline</button>
+        <button type="button" data-cookie="accept" class="is-primary">Accept</button>
+      </div>
+    </div>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
