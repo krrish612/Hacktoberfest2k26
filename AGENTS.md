@@ -30,6 +30,22 @@ npm run build          # typecheck + vite production build
 Rust/Tauri compile checks require the Rust toolchain and MSVC Build Tools, which
 are not installed on this machine yet (see README prerequisites).
 
+## Documentation sync
+
+`docs/PROJECT_OVERVIEW.md` is the living overview of the codebase. Update it in
+the **same change** that touches the code it describes.
+
+- Whenever you add, remove, or change a module under `src/` or `src-tauri/src/`,
+  a script in `package.json`, or a setting in `src-tauri/tauri.conf.json`, update
+  the matching section of `docs/PROJECT_OVERVIEW.md` before the change is done.
+- Sections to check: 2 (structure), 3 (key components), 5 (getting started), and
+  6 (api/usage).
+- Keep edits small and plain. Add a line when a module appears; remove one when
+  it goes.
+- Never put api keys, tokens, or personal data in the doc.
+- `.github/workflows/docs-sync.yml` flags a source change that lands without a
+  doc change, so drift is visible on the pull request or push.
+
 ## Scope discipline
 
 Build work proceeds in stages. Stay within the current stage; do not pull

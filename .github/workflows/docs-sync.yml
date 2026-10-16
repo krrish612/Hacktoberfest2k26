@@ -1,0 +1,60 @@
+name: docs-sync
+
+# flags a change to source code that does not also touch
+# docs/PROJECT_OVERVIEW.md, so documentation drift shows up on the pull request
+# or push. this is a soft check: it warns and writes a summary, it does not fail
+# the build.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check docs are in sync with code
+        shell: bash
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
+            BASE="origin/${GITHUB_BASE_REF}"
+          elif [ -n "${GITHUB_EVENT_BEFORE}" ] && [ "${GITHUB_EVENT_BEFORE}" != "0000000000000000000000000000000000000000" ]; then
+            BASE="${GITHUB_EVENT_BEFORE}"
+          else
+            BASE="HEAD~1"
+          fi
+          echo "comparing against ${BASE}"
+          CHANGED="$(git diff --name-only "${BASE}" HEAD)"
+          echo "${CHANGED}"
+
+          SRC="$(echo "${CHANGED}" | grep -E '^(src/|src-tauri/src/|package\.json$|src-tauri/tauri\.conf\.json$)' || true)"
+          DOC="$(echo "${CHANGED}" | grep -E '^docs/PROJECT_OVERVIEW\.md$' || true)"
+
+          if [ -n "${SRC}" ] && [ -z "${DOC}" ]; then
+            echo "::warning title=docs out of sync::source changed without a docs/PROJECT_OVERVIEW.md update"
+            {
+              echo "### docs may be out of sync"
+              echo ""
+              echo "these source files changed but \`docs/PROJECT_OVERVIEW.md\` did not:"
+              echo ""
+              echo "${SRC}" | sed 's/^/- /'
+              echo ""
+              echo "update the matching section of \`docs/PROJECT_OVERVIEW.md\`."
+            } >> "${GITHUB_STEP_SUMMARY}"
+          else
+            echo "docs are in sync with code (or only docs changed)."
+          fi
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
