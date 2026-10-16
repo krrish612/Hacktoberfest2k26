@@ -226,12 +226,14 @@ let mut stmt = conn.prepare("select id, name from gear where id = ?1")?;
 
 **`src-tauri/src/packet.rs`**
 - what: builds the repair-packet report and the zip. it escapes every record
-  value for html, masks the serial number unless the photographer opts in, and
-  copies evidence files verbatim.
+  value for html, reports warranty status only when its dates are confirmed,
+  masks the serial number unless the photographer opts in, and copies evidence
+  files verbatim.
 - why: keeping all packet logic in one place makes the safety rules (ownership,
   html escaping, path containment, size cap) easy to audit and test.
-- key detail: `MAX_PACKET_BYTES` caps a packet, and a stored file name is only
-  rejoined onto the evidence directory after separators and `..` are rejected.
+- key detail: `MAX_PACKET_BYTES` caps a packet. Evidence paths reject unsafe
+  names and symlinks, then resolve canonically inside the evidence directory;
+  packet temp files use unique names and are atomically renamed into place.
 
 **`src-tauri/src/document.rs`**
 - what: extracts text from pdf files before any read.

@@ -7,8 +7,8 @@
 
 use std::collections::HashSet;
 use std::fmt::Write as _;
-use std::fs::File;
-use std::io::Write as _;
+use std::fs::{self, File, OpenOptions};
+use std::io::{Read as _, Write as _};
 use std::path::{Path, PathBuf};
 
 use crate::archive::ZipWriter;
@@ -115,8 +115,11 @@ fn price(amount: Option<f64>, currency: &Option<String>) -> String {
     }
 }
 
-fn warranty_status(end: &Option<String>) -> &'static str {
-    let Some(raw) = end else {
+fn warranty_status(gear: &Gear) -> &'static str {
+    if !gear.warranty_confirmed {
+        return "Not confirmed";
+    }
+    let Some(raw) = gear.warranty_end.as_ref() else {
         return "Not recorded";
     };
     let Ok(date) = chrono::NaiveDate::parse_from_str(raw.trim(), "%Y-%m-%d") else {
@@ -253,7 +256,7 @@ pub fn summary_html(
     .join("");
 
     let warranty = [
-        row("Status", warranty_status(&gear.warranty_end)),
+        row("Status", warranty_status(gear)),
         row("Cover ends", &text(&gear.warranty_end)),
         row("Covered from", &text(&gear.warranty_start)),
         row("Terms", &text(&gear.warranty_terms)),
@@ -361,7 +364,21 @@ fn evidence_path(evidence_dir: &Path, stored_name: &str) -> AppResult<PathBuf> {
     if unsafe_name {
         return Err(AppError::internal("An attachment path was unsafe."));
     }
-    Ok(evidence_dir.join(stored_name))
+    let root = fs::canonicalize(evidence_dir)?;
+    let candidate = evidence_dir.join(stored_name);
+    let metadata = fs::symlink_metadata(&candidate)?;
+    if metadata.file_type().is_symlink() || !metadata.is_file() {
+        return Err(AppError::validation(
+            "One of the selected evidence files is unavailable.",
+        ));
+    }
+    let resolved = fs::canonicalize(candidate)?;
+    if !resolved.starts_with(root) {
+        return Err(AppError::validation(
+            "One of the selected evidence files is unavailable.",
+        ));
+    }
+    Ok(resolved)
 }
 
 fn write_atomic(dest: &Path, bytes: &[u8]) -> AppResult<()> {
@@ -373,21 +390,22 @@ fn write_atomic(dest: &Path, bytes: &[u8]) -> AppResult<()> {
         return Err(AppError::validation("That folder no longer exists."));
     }
 
-    let temp = dest.with_extension("zip.part");
-    {
-        let mut file = File::create(&temp)?;
+    let temp = parent.join(format!(".shutterproof-{}.zip.part", uuid::Uuid::new_v4()));
+    let result = (|| -> AppResult<()> {
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&temp)?;
         file.write_all(bytes)?;
         file.flush()?;
         file.sync_all()?;
-    }
-    if dest.exists() {
-        std::fs::remove_file(dest)?;
-    }
-    if let Err(error) = std::fs::rename(&temp, dest) {
+        fs::rename(&temp, dest)?;
+        Ok(())
+    })();
+    if result.is_err() {
         let _ = std::fs::remove_file(&temp);
-        return Err(error.into());
     }
-    Ok(())
+    result
 }
 
 /// Writes the packet to `dest_path`, returning its size in bytes.
@@ -406,22 +424,40 @@ pub fn write_packet(
     let mut total = report.len() as u64;
     for (index, item) in evidence.iter().enumerate() {
         let path = evidence_path(evidence_dir, &item.stored_name)?;
-        let bytes = std::fs::read(&path).map_err(|_| {
+        let file = File::open(&path).map_err(|_| {
             AppError::validation(format!(
                 "{} could not be read. It may have been moved or removed.",
                 item.original_name
             ))
         })?;
-        total += bytes.len() as u64;
-        if total > MAX_PACKET_BYTES {
+        let file_size = file.metadata()?.len();
+        let remaining = MAX_PACKET_BYTES.saturating_sub(total);
+        if file_size > crate::files::MAX_EVIDENCE_BYTES || file_size > remaining {
             return Err(AppError::validation(
                 "The selected files are too large for one repair packet.",
             ));
         }
+        let read_limit = crate::files::MAX_EVIDENCE_BYTES
+            .min(remaining)
+            .saturating_add(1);
+        let mut bytes = Vec::with_capacity(file_size as usize);
+        std::io::Read::take(file, read_limit).read_to_end(&mut bytes)?;
+        let actual_size = bytes.len() as u64;
+        if actual_size > crate::files::MAX_EVIDENCE_BYTES || actual_size > remaining {
+            return Err(AppError::validation(
+                "The selected files are too large for one repair packet.",
+            ));
+        }
+        total = total.saturating_add(actual_size);
         writer.add(&entry_name(index, item), &bytes)?;
     }
 
     let archive = writer.finish();
+    if archive.len() as u64 > MAX_PACKET_BYTES {
+        return Err(AppError::validation(
+            "The selected files are too large for one repair packet.",
+        ));
+    }
     write_atomic(dest_path, &archive)?;
     Ok(archive.len() as i64)
 }
@@ -482,6 +518,16 @@ mod tests {
 
         let full = summary_html(&gear(), &[], &[], true);
         assert!(full.contains("SN-1234-5678"));
+    }
+
+    #[test]
+    fn warranty_status_is_never_reported_for_unconfirmed_dates() {
+        let mut item = gear();
+        item.warranty_confirmed = false;
+
+        let html = summary_html(&item, &[], &[], false);
+        assert!(html.contains("<th scope=\"row\">Status</th><td>Not confirmed</td>"));
+        assert!(!html.contains("<th scope=\"row\">Status</th><td>Active</td>"));
     }
 
     #[test]
