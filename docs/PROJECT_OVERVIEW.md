@@ -187,7 +187,8 @@ export function warrantyView(gear: Gear, now: Date = new Date()): WarrantyView {
 - `LocalDataPanel.tsx` - shows where data lives and backup actions, and reports a
   failed backup or restore inside the panel.
 - `Section.tsx`, `DetailList.tsx`, `Icon.tsx` - small shared pieces.
-- `ConfirmDialog.tsx`, `Toast.tsx` - confirmation and feedback.
+- `ConfirmDialog.tsx`, `Toast.tsx` - confirmation and feedback. the confirm dialog
+  accepts an `error` so a failed delete stays open and shows the reason inside it.
 - why: each piece owns one job, so a screen is a short list of named parts
   instead of one large file.
 

@@ -65,6 +65,7 @@ function Workspace() {
   const [editor, setEditor] = useState<Gear | "new" | null>(null);
   const [editorPreset, setEditorPreset] = useState<Partial<GearInput> | null>(null);
   const [confirm, setConfirm] = useState<Confirm>(null);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
   const [showData, setShowData] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
   const [reading, setReading] = useState(false);
@@ -87,6 +88,16 @@ function Workspace() {
   const closeEditor = () => {
     setEditor(null);
     setEditorPreset(null);
+  };
+
+  const openConfirm = (kind: Exclude<Confirm, null>) => {
+    setConfirmError(null);
+    setConfirm(kind);
+  };
+
+  const closeConfirm = () => {
+    setConfirmError(null);
+    setConfirm(null);
   };
 
   const openData = () => {
@@ -137,7 +148,7 @@ function Workspace() {
         busy={Boolean(records.busy)}
         detailLoading={records.detailLoading}
         onEdit={() => records.selected && openEditor(records.selected)}
-        onDelete={() => setConfirm("delete")}
+        onDelete={() => openConfirm("delete")}
         onAttach={records.attachEvidence}
         onRemoveEvidence={records.removeEvidence}
         onAddEvent={records.addEvent}
@@ -203,11 +214,19 @@ function Workspace() {
           confirmLabel="Delete record"
           tone="danger"
           busy={Boolean(records.busy)}
-          onConfirm={() => {
+          error={confirmError}
+          onConfirm={async () => {
             const id = records.selected?.id;
-            if (id) records.deleteGear(id).then(() => setConfirm(null));
+            if (!id) {
+              closeConfirm();
+              return;
+            }
+            setConfirmError(null);
+            const result = await records.deleteGear(id);
+            if (result.ok) closeConfirm();
+            else setConfirmError(result.error ?? "Something went wrong. Please try again.");
           }}
-          onCancel={() => setConfirm(null)}
+          onCancel={closeConfirm}
         />
       ) : null}
 
@@ -220,10 +239,10 @@ function Workspace() {
           onConfirm={() =>
             records.restore().then((result) => {
               recordResult(result);
-              setConfirm(null);
+              closeConfirm();
             })
           }
-          onCancel={() => setConfirm(null)}
+          onCancel={closeConfirm}
         />
       ) : null}
 
@@ -234,7 +253,7 @@ function Workspace() {
           busy={Boolean(records.busy)}
           error={dataError}
           onBackup={() => void records.backup().then(recordResult)}
-          onRestore={() => setConfirm("restore")}
+          onRestore={() => openConfirm("restore")}
           onClose={closeData}
         />
       ) : null}

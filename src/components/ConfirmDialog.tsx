@@ -8,6 +8,8 @@ interface ConfirmDialogProps {
   confirmLabel: string;
   tone?: "default" | "danger";
   busy?: boolean;
+  /** A failed confirm, shown here because a toast sits behind the dialog. */
+  error?: string | null;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -18,6 +20,7 @@ export function ConfirmDialog({
   confirmLabel,
   tone = "default",
   busy = false,
+  error = null,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -51,6 +54,7 @@ export function ConfirmDialog({
         </button>
       </div>
       <p className="sheet__lede">{message}</p>
+      {error ? <p className="form__error">{error}</p> : null}
       <div className="sheet__foot">
         <span className="sheet__note">This cannot be undone.</span>
         <div className="form__actions">
