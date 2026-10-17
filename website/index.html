@@ -3,76 +3,204 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ShutterProof · gear passport for wedding photographers</title>
+    <title>ShutterProof — the AI-powered gear passport your camera bag deserves (parody site)</title>
     <meta
       name="description"
-      content="ShutterProof keeps a wedding photographer's gear records, proof of purchase and warranty details on the machine, so a repair packet is ready when equipment needs service."
+      content="A deliberately over-the-top parody marketing page for ShutterProof, a real local-first Windows app that keeps a wedding photographer's gear records, receipts and warranty details on the machine. All testimonials, prices and stats on this page are fictional."
     />
+    <meta name="color-scheme" content="light" />
+    <meta name="robots" content="noindex" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="progress" aria-hidden="true"><span data-progress></span></div>
-    <div class="grain" aria-hidden="true"></div>
+    <svg class="sprite" aria-hidden="true" focusable="false" width="0" height="0">
+      <defs>
+        <symbol id="i-camera" viewBox="0 0 24 24">
+          <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+          <circle cx="12" cy="13" r="3" />
+        </symbol>
+        <symbol id="i-sparkles" viewBox="0 0 24 24">
+          <path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.14 1.58a.5.5 0 0 1 0 .96l-6.14 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z" />
+          <path d="M20 3v4" /><path d="M22 5h-4" /><path d="M4 17v2" /><path d="M5 18H3" />
+        </symbol>
+        <symbol id="i-zap" viewBox="0 0 24 24">
+          <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
+        </symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24">
+          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+          <path d="m9 12 2 2 4-4" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <path d="m7 10 5 5 5-5" /><path d="M12 15V3" />
+        </symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24">
+          <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+        </symbol>
+        <symbol id="i-star" viewBox="0 0 24 24">
+          <path d="M11.5 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.12 2.12 0 0 0 1.6 1.16l5.16.76a.53.53 0 0 1 .3.9l-3.74 3.64a2.12 2.12 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.12 2.12 0 0 0-1.97 0L6.4 21.01a.53.53 0 0 1-.77-.56l.88-5.14a2.12 2.12 0 0 0-.61-1.88L2.16 9.8a.53.53 0 0 1 .3-.9l5.16-.76a2.12 2.12 0 0 0 1.6-1.16z" />
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+          <rect width="18" height="11" x="3" y="11" rx="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </symbol>
+        <symbol id="i-file" viewBox="0 0 24 24">
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z" />
+          <path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M10 9H8" /><path d="M16 13H8" /><path d="M16 17H8" />
+        </symbol>
+        <symbol id="i-cpu" viewBox="0 0 24 24">
+          <rect width="16" height="16" x="4" y="4" rx="2" />
+          <rect width="6" height="6" x="9" y="9" rx="1" />
+          <path d="M15 2v2" /><path d="M15 20v2" /><path d="M2 15h2" /><path d="M2 9h2" />
+          <path d="M20 15h2" /><path d="M20 9h2" /><path d="M9 2v2" /><path d="M9 20v2" />
+        </symbol>
+        <symbol id="i-rocket" viewBox="0 0 24 24">
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+          <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+          <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" /><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+        </symbol>
+        <symbol id="i-infinity" viewBox="0 0 24 24">
+          <path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z" />
+        </symbol>
+        <symbol id="i-quote" viewBox="0 0 24 24">
+          <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .5-1 1 .5 1 1 1z" />
+          <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2h-4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2h.5c.5 0 .5 0 .5 1v1c0 1-1 2-2 2s-1 .5-1 1 .5 1 1 1z" />
+        </symbol>
+        <symbol id="i-heart" viewBox="0 0 24 24">
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+        </symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z" />
+          <path d="M12 9v4" /><path d="M12 17h.01" />
+        </symbol>
+        <symbol id="i-info" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
+        </symbol>
+        <symbol id="i-image" viewBox="0 0 24 24">
+          <rect width="18" height="18" x="3" y="3" rx="2" />
+          <circle cx="9" cy="9" r="2" />
+          <path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21" />
+        </symbol>
+      </defs>
+    </svg>
+
+    <div class="boot" id="boot" role="status" aria-live="polite" aria-label="Loading">
+      <div class="boot__card">
+        <div class="boot__ring" aria-hidden="true"></div>
+        <p class="boot__brand"><span class="grad">ShutterProof</span> ✨</p>
+        <p class="boot__msg" data-boot-msg>Reticulating splines…</p>
+        <div class="boot__bar" aria-hidden="true"><span data-boot-bar></span></div>
+        <div class="boot__skeleton" aria-hidden="true">
+          <span class="sk sk--lg"></span>
+          <span class="sk sk--md"></span>
+          <span class="sk sk--sm"></span>
+          <span class="sk sk--row"></span>
+          <span class="sk sk--row"></span>
+          <span class="sk sk--row"></span>
+        </div>
+        <p class="boot__note">Preparing an experience… (this is theatre)</p>
+        <button class="boot__skip" type="button" data-boot-skip>
+          Skip the theatre <span aria-hidden="true">⏭</span>
+        </button>
+      </div>
+    </div>
+
     <a class="skip" href="#main">Skip to content</a>
+
+    <div class="banner" role="note">
+      <strong>⚠️ Parody page.</strong> A self-aware send-up of over-designed startup
+      landing pages built for the real, local-first ShutterProof app. Every testimonial,
+      price, statistic and “customer” on this page is <em>fictional</em>. The product facts are real.
+    </div>
+
+    <div class="progress" aria-hidden="true"><span data-progress></span></div>
+    <div class="dots" aria-hidden="true"></div>
 
     <header class="topbar" id="topbar">
       <a class="brand" href="#top">
-        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__mark" aria-hidden="true"><svg class="ic"><use href="#i-camera" /></svg></span>
         <span class="brand__name">ShutterProof</span>
+        <span class="brand__badge">v1.0 ✨</span>
       </a>
       <nav class="nav" aria-label="Primary">
-        <a href="#features"><span class="nav__num">01</span>Features</a>
-        <a href="#privacy"><span class="nav__num">02</span>Privacy</a>
-        <a href="#how"><span class="nav__num">03</span>How it works</a>
-        <a href="#download"><span class="nav__num">04</span>Download</a>
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#download">Download</a>
       </nav>
-      <a class="topbar__cta" href="#download">Get the app</a>
+      <a class="topbar__cta" href="#download" data-magnetic>
+        <svg class="ic"><use href="#i-sparkles" /></svg> Get the app
+      </a>
     </header>
 
     <main id="main">
       <section class="hero" id="top">
-        <div class="hero__meta" data-hero="1">
-          <span>(Gear passport / ©<span data-year>2026</span>)</span>
-          <span>Windows · local-first</span>
-        </div>
+        <div class="orb orb--a" aria-hidden="true"></div>
+        <div class="orb orb--b" aria-hidden="true"></div>
+        <div class="orb orb--c" aria-hidden="true"></div>
 
-        <h1 class="display">
-          <span class="display__mask">
-            <span class="display__text" data-hero="2">
-              Shutter<span class="display__thin">Proof</span>
-            </span>
-          </span>
-        </h1>
-
-        <div class="hero__row">
-          <p class="hero__lede" data-hero="3">
-            I keep a wedding photographer's gear, receipts and warranty details
-            together, on your machine, not someone's cloud. So when a lens needs
-            service, the repair packet is already written.
+        <div class="hero__inner">
+          <p class="pill" data-hero="1">
+            <span class="pill__dot" aria-hidden="true"></span>
+            Now with 100% locally-run vibes · 🚀 Blazing fast
           </p>
-          <div class="hero__aside" data-hero="4">
-            <span class="label">(Local-first desktop app)</span>
-            <span class="label">No accounts · No telemetry</span>
+
+          <h1 class="display" data-hero="2">
+            It's not a gear tracker.<br />
+            It's a <span class="grad">gear passport</span> for people who
+            over-think warranties.
+          </h1>
+
+          <p class="hero__lede" data-hero="3">
+            ShutterProof keeps a wedding photographer's gear, receipts and warranty
+            details together, on your machine, not someone's cloud — so when a lens
+            needs service, the repair packet is already written.
+          </p>
+
+          <div class="hero__actions" data-hero="4">
+            <a class="btn btn--rainbow" href="#download" data-magnetic>
+              <svg class="ic"><use href="#i-download" /></svg> Download for Windows
+            </a>
+            <button class="btn btn--glass" type="button" data-fake-demo>
+              <svg class="ic"><use href="#i-sparkles" /></svg> Watch the demo
+              <span class="btn__tag">no demo exists</span>
+            </button>
+          </div>
+
+          <div class="proof" data-hero="5">
+            <div class="proof__avatars" aria-hidden="true">
+              <span>🧑‍🎤</span><span>👩‍💻</span><span>🧔</span><span>👽</span>
+            </div>
+            <p class="proof__text">
+              Trusted by <strong>0</strong> photographers
+              <span class="fict">(fictional figures)</span>
+            </p>
+            <p class="proof__stars" aria-hidden="true">★★★★★</p>
           </div>
         </div>
 
-        <div class="hero__actions" data-hero="5">
-          <a class="btn btn--solid" href="#download" data-magnetic>
-            Get ShutterProof <span aria-hidden="true">→</span>
-          </a>
-          <a class="btn btn--ghost" href="#features" data-magnetic>See what it does</a>
+        <div class="terminal" data-hero="6" aria-hidden="true">
+          <div class="terminal__bar">
+            <span class="tdot tdot--r"></span><span class="tdot tdot--y"></span><span class="tdot tdot--g"></span>
+            <span class="terminal__title">shutterproof — local-first setup</span>
+          </div>
+          <pre class="terminal__body"><span class="t-dim"># nothing leaves this machine</span>
+<span class="t-prompt">$</span> curl -s 127.0.0.1:11434/api/tags
+<span class="t-ok">✓</span> ollama .. <span class="t-ok">reachable</span>   <span class="t-dim">(your machine only)</span>
+<span class="t-prompt">$</span> shutterproof --warranty
+<span class="t-ok">✓</span> records .. SQLite    <span class="t-dim">in %APPDATA%\app.shutterproof.desktop</span>
+<span class="t-ok">✓</span> evidence . originals  <span class="t-dim">max 25 MB / file</span>
+<span class="t-ok">✓</span> packet ... repair-packet.zip
+<span class="t-dim"># no account. no cloud. no telemetry.</span></pre>
         </div>
-
-        <p class="scroll-hint" data-hero="6">
-          <span class="scroll-hint__line" aria-hidden="true"></span>
-          scroll, gently
-        </p>
       </section>
 
       <div class="marquee" aria-hidden="true">
@@ -80,7 +208,7 @@
           <span>Gear passport</span><span class="dot">·</span>
           <span>Warranty</span><span class="dot">·</span>
           <span>Receipts</span><span class="dot">·</span>
-          <span>Serial numbers</span><span class="dot">·</span>
+          <span>Masked serials</span><span class="dot">·</span>
           <span>Service history</span><span class="dot">·</span>
           <span>Repair packet</span><span class="dot">·</span>
           <span>Local model</span><span class="dot">·</span>
@@ -90,14 +218,16 @@
 
       <section class="section" id="features">
         <div class="section__head reveal">
-          <span class="label">(Selected features 04)</span>
+          <span class="label">(Selected features 03 — exactly three, as is law)</span>
           <span class="label">2026</span>
         </div>
 
         <div class="cards">
-          <article class="card reveal" data-delay="1">
+          <article class="card reveal" data-delay="1" data-tilt>
+            <span class="card__stripe" aria-hidden="true"></span>
+            <span class="card__icon"><svg class="ic"><use href="#i-camera" /></svg></span>
             <span class="card__num">01</span>
-            <h2 class="card__title">Gear passport</h2>
+            <h2 class="card__title">Gear Passport™</h2>
             <p class="card__body">
               One record per body, lens or flash. Make, model, category, a masked
               serial, purchase details and warranty. The whole identity of a piece
@@ -106,52 +236,90 @@
             <span class="card__tag">Records</span>
           </article>
 
-          <article class="card reveal" data-delay="2">
+          <article class="card reveal" data-delay="2" data-tilt>
+            <span class="card__stripe" aria-hidden="true"></span>
+            <span class="card__icon"><svg class="ic"><use href="#i-sparkles" /></svg></span>
             <span class="card__num">02</span>
-            <h2 class="card__title">Read a receipt</h2>
+            <h2 class="card__title">Receipt reading, but local</h2>
             <p class="card__body">
-              Pick a PDF, JPEG or PNG. A model running on your own machine
-              suggests the seller, date, item, price and serial. Every value
-              arrives as a suggestion you review before it is saved.
+              Pick a PDF, JPEG or PNG. A model running on your own machine suggests
+              the seller, date, item, price and serial. Every value arrives as a
+              suggestion you review before it is saved.
             </p>
             <span class="card__tag">Local AI</span>
           </article>
 
-          <article class="card reveal" data-delay="3">
+          <article class="card reveal" data-delay="3" data-tilt>
+            <span class="card__stripe" aria-hidden="true"></span>
+            <span class="card__icon"><svg class="ic"><use href="#i-file" /></svg></span>
             <span class="card__num">03</span>
-            <h2 class="card__title">Evidence &amp; timeline</h2>
+            <h2 class="card__title">Repair Packet, assembled</h2>
             <p class="card__body">
-              Attach the receipt, the warranty document and a photo of the
-              serial. Keep a timeline of purchase, inspections, repairs and
-              transfers so the story of the gear stays in order.
+              Purchase proof, warranty terms and the serial photo, gathered against
+              one piece of kit into a single ZIP, ready for a repair. Evidence
+              originals are capped at 25 MB each.
             </p>
             <span class="card__tag">Proof</span>
           </article>
+        </div>
 
-          <article class="card reveal" data-delay="4">
-            <span class="card__num">04</span>
-            <h2 class="card__title">Back up &amp; restore</h2>
-            <p class="card__body">
-              Copy the database and every original into a plain folder you
-              choose. Ordinary files you can move to another drive, not a
-              locked-in vault.
+        <div class="bento">
+          <article class="tile tile--wide reveal" data-delay="1">
+            <span class="tile__icon"><svg class="ic"><use href="#i-cpu" /></svg></span>
+            <h3 class="tile__title">A model on <code>127.0.0.1</code></h3>
+            <p class="tile__body">
+              Receipt reading uses a vision model you run yourself through Ollama.
+              It never calls a remote service — there is nowhere for it to call.
             </p>
-            <span class="card__tag">Safety</span>
+            <span class="chip">Local model</span>
+          </article>
+          <article class="tile reveal" data-delay="2">
+            <span class="tile__icon"><svg class="ic"><use href="#i-info" /></svg></span>
+            <h3 class="tile__title">Plain SQLite</h3>
+            <p class="tile__body">
+              Records live in an ordinary database file in the app's private data
+              directory. Evidence originals sit right beside them.
+            </p>
+          </article>
+          <article class="tile reveal" data-delay="3">
+            <span class="tile__icon"><svg class="ic"><use href="#i-lock" /></svg></span>
+            <h3 class="tile__title">No account, ever</h3>
+            <p class="tile__body">
+              No sign-up, no cloud, no telemetry. Warranty dates are never filled
+              in automatically — you enter and confirm them yourself.
+            </p>
+          </article>
+          <article class="tile tile--tall reveal" data-delay="4">
+            <span class="tile__icon"><svg class="ic"><use href="#i-image" /></svg></span>
+            <h3 class="tile__title">Evidence &amp; timeline</h3>
+            <p class="tile__body">
+              Attach the receipt, the warranty document and a photo of the serial.
+              Keep a timeline of purchase, inspections, repairs and transfers so
+              the story of the gear stays in order.
+            </p>
+            <span class="chip">Proof</span>
+          </article>
+          <article class="tile reveal" data-delay="5">
+            <span class="tile__icon"><svg class="ic"><use href="#i-infinity" /></svg></span>
+            <h3 class="tile__title">Back up anywhere</h3>
+            <p class="tile__body">
+              Copy the database and every original into a plain folder you choose —
+              ordinary files, not a locked-in vault.
+            </p>
           </article>
         </div>
       </section>
 
-      <section class="statement is-invert">
-        <p class="statement__text reveal" data-parallax="0.06">
-          Everything stays on the machine. No accounts, no cloud, no telemetry,
-          and no network calls except to a <em>local</em> model server you run
-          yourself.
+      <section class="statement">
+        <p class="statement__text reveal">
+          It's not a database. It's a <em>passport</em> for gear that has feelings
+          <span class="fict">(it does not have feelings)</span>.
         </p>
       </section>
 
       <section class="section" id="how">
         <div class="section__head reveal">
-          <span class="label">(Up close)</span>
+          <span class="label">(How it works)</span>
           <span class="label">Read a receipt</span>
         </div>
 
@@ -160,8 +328,8 @@
             <span class="step__num">01 →</span>
             <h3>Install the model</h3>
             <p>
-              Pull a small vision model once with Ollama. It runs on your
-              computer, on <code>127.0.0.1</code>. Nothing is sent anywhere else.
+              Pull a small vision model once with Ollama. It runs on your computer,
+              on <code>127.0.0.1</code>. Nothing is sent anywhere else.
             </p>
           </div>
           <div class="step reveal" data-delay="2">
@@ -184,17 +352,18 @@
             <span class="step__num">04 →</span>
             <h3>Send the packet</h3>
             <p>
-              Purchase proof, warranty terms and the serial photo, gathered
-              against one piece of kit, ready for a repair.
+              Purchase proof, warranty terms and the serial photo, gathered against
+              one piece of kit, ready for a repair.
             </p>
           </div>
         </div>
       </section>
 
-      <section class="section" id="privacy">
+      <section class="section section--dark" id="privacy">
+        <div class="orb orb--d" aria-hidden="true"></div>
         <div class="section__head reveal">
           <span class="label">(Privacy model)</span>
-          <span class="label">By design</span>
+          <span class="label">By design · not a policy</span>
         </div>
 
         <div class="privacy">
@@ -203,28 +372,28 @@
           </h2>
           <ul class="privacy__list">
             <li class="reveal" data-delay="1">
-              <span class="label">01</span>
+              <span class="check" aria-hidden="true"><svg class="ic"><use href="#i-check" /></svg></span>
               <p>
                 Records and originals live in the app's private data directory on
                 this device.
               </p>
             </li>
             <li class="reveal" data-delay="2">
-              <span class="label">02</span>
+              <span class="check" aria-hidden="true"><svg class="ic"><use href="#i-check" /></svg></span>
               <p>
-                Receipt reading uses a model on <code>127.0.0.1</code> only,
-                never a remote service.
+                Receipt reading uses a model on <code>127.0.0.1</code> only, never a
+                remote service.
               </p>
             </li>
             <li class="reveal" data-delay="3">
-              <span class="label">03</span>
+              <span class="check" aria-hidden="true"><svg class="ic"><use href="#i-check" /></svg></span>
               <p>
-                The interface never touches your files or database directly.
-                Every action goes through a validated command.
+                The interface never touches your files or database directly. Every
+                action goes through a validated command.
               </p>
             </li>
             <li class="reveal" data-delay="4">
-              <span class="label">04</span>
+              <span class="check" aria-hidden="true"><svg class="ic"><use href="#i-check" /></svg></span>
               <p>
                 Warranty dates are never filled in automatically. You enter and
                 confirm them yourself.
@@ -232,26 +401,169 @@
             </li>
           </ul>
         </div>
+
+        <div class="no-legal reveal">
+          <span class="no-legal__icon" aria-hidden="true"><svg class="ic"><use href="#i-alert" /></svg></span>
+          <div>
+            <h3>There is no Terms of Service. There is no Privacy Policy.</h3>
+            <p>
+              This is a parody page — there is nothing to accept, nothing to agree
+              to, and nothing collected. The real app keeps everything on your
+              device and does not phone home. (Parody trope: “no real legal pages.”)
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="pricing">
+        <div class="section__head reveal">
+          <span class="label">(Pricing)</span>
+          <span class="label">All figures fictional · demo only</span>
+        </div>
+
+        <div class="pricing">
+          <article class="price reveal" data-delay="1">
+            <h3 class="price__name">Starter</h3>
+            <p class="price__amount"><span>$0</span><small>/ forever</small></p>
+            <p class="price__note">Actually real. The app is free and local.</p>
+            <ul class="price__list">
+              <li><svg class="ic"><use href="#i-check" /></svg> Gear records ✓</li>
+              <li><svg class="ic"><use href="#i-check" /></svg> Local receipt reading ✓</li>
+              <li><svg class="ic"><use href="#i-check" /></svg> Repair packet ZIP ✓</li>
+              <li><svg class="ic"><use href="#i-check" /></svg> Backups ✓</li>
+            </ul>
+            <a class="btn btn--ghost btn--full" href="#download">Download</a>
+          </article>
+
+          <article class="price price--pro reveal" data-delay="2">
+            <span class="price__ribbon">MOST LIKELY TO BE FICTION</span>
+            <h3 class="price__name">Pro</h3>
+            <p class="price__amount"><span>$29</span><small>/ month</small></p>
+            <p class="price__note">Fictional. Unlocks a gradient. Only a gradient.</p>
+            <ul class="price__list">
+              <li><svg class="ic"><use href="#i-check" /></svg> Everything in Starter</li>
+              <li><svg class="ic"><use href="#i-check" /></svg> A purple gradient badge</li>
+              <li><svg class="ic"><use href="#i-check" /></svg> Priority vibes (unmeasurable)</li>
+              <li><svg class="ic"><use href="#i-check" /></svg> Still no cloud (there is no cloud)</li>
+            </ul>
+            <button class="btn btn--rainbow btn--full" type="button" data-fake-demo>
+              Upgrade (does nothing)
+            </button>
+          </article>
+
+          <article class="price reveal" data-delay="3">
+            <h3 class="price__name">Enterprise</h3>
+            <p class="price__amount"><span>Call us</span></p>
+            <p class="price__note">Fictional. We will not call back. There is no us.</p>
+            <ul class="price__list">
+              <li><svg class="ic"><use href="#i-check" /></svg> A dedicated Slack channel*</li>
+              <li><svg class="ic"><use href="#i-check" /></svg> SSO for one user</li>
+              <li><svg class="ic"><use href="#i-check" /></svg> A quarterly PDF no one reads</li>
+              <li><svg class="ic"><use href="#i-check" /></svg> A logo wall you can’t join</li>
+            </ul>
+            <button class="btn btn--ghost btn--full" type="button" data-fake-demo>
+              Contact sales
+            </button>
+          </article>
+        </div>
+        <p class="pricing__fine reveal">
+          *Fictional. <strong>No purchases are possible.</strong> This page has no
+          checkout, no payment form and no analytics. It is a parody demo.
+        </p>
+      </section>
+
+      <section class="section" id="love">
+        <div class="section__head reveal">
+          <span class="label">(Wall of love)</span>
+          <span class="label">100% fictional humans</span>
+        </div>
+        <div class="quotes">
+          <figure class="quote reveal" data-delay="1">
+            <svg class="quote__mark ic"><use href="#i-quote" /></svg>
+            <blockquote>
+              “I cried. Then I photographed the crying. Then I logged the lens I
+              used to photograph the crying.”
+            </blockquote>
+            <figcaption>A. Photographer <span class="fict">(does not exist)</span></figcaption>
+          </figure>
+          <figure class="quote reveal" data-delay="2">
+            <svg class="quote__mark ic"><use href="#i-quote" /></svg>
+            <blockquote>
+              “It’s like Notion, but for a single camera bag, and it never asks me
+              to upgrade.”
+            </blockquote>
+            <figcaption>B. Videographer <span class="fict">(fictional)</span></figcaption>
+          </figure>
+          <figure class="quote reveal" data-delay="3">
+            <svg class="quote__mark ic"><use href="#i-quote" /></svg>
+            <blockquote>
+              “The repair packet saved my warranty claim. I have never filed a
+              warranty claim.”
+            </blockquote>
+            <figcaption>C. Enthusiast <span class="fict">(invented for this page)</span></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <div class="section__head reveal">
+          <span class="label">(FAQ)</span>
+          <span class="label">Questions nobody asked</span>
+        </div>
+        <div class="faq">
+          <details class="faq__item reveal" open>
+            <summary>Is there a live demo?</summary>
+            <p>
+              No. There is no demo. There is a button that says “Watch the demo” and
+              it does nothing. That <em>is</em> the demo. (Parody trope: “no real
+              demo.”)
+            </p>
+          </details>
+          <details class="faq__item reveal">
+            <summary>Does it use AI?</summary>
+            <p>
+              Yes — a local vision model served by Ollama on <code>127.0.0.1</code>.
+              It does not phone home. It cannot; there is no phone.
+            </p>
+          </details>
+          <details class="faq__item reveal">
+            <summary>Where is my data?</summary>
+            <p>
+              In an SQLite database and an evidence folder inside the app's private
+              data directory on your machine. Not on a server, because there is no
+              server.
+            </p>
+          </details>
+          <details class="faq__item reveal">
+            <summary>Is this really a parody?</summary>
+            <p>
+              Yes. Everything decorative — the testimonials, the pricing, the stats,
+              the “wall of love” — is fictional. The descriptions of how the real
+              app behaves are accurate. See the banner at the top.
+            </p>
+          </details>
+        </div>
       </section>
 
       <section class="cta" id="download">
+        <div class="orb orb--e" aria-hidden="true"></div>
         <div class="cta__inner reveal">
           <span class="label">(Download)</span>
           <h2 class="cta__title">Ready when the kit needs fixing.</h2>
           <p class="cta__text">
-            ShutterProof is a local-first Windows app. Installers are unsigned,
-            so Windows SmartScreen will warn on first run.
+            ShutterProof is a local-first Windows app. Installers are unsigned, so
+            Windows SmartScreen will warn on first run.
+            <span class="fict">(Buttons below are decorative on this parody page.)</span>
           </p>
           <div class="hero__actions">
-            <a class="btn btn--solid" href="#" data-magnetic>
-              Download for Windows <span aria-hidden="true">→</span>
+            <a class="btn btn--rainbow" href="#" data-fake-demo>
+              <svg class="ic"><use href="#i-download" /></svg> Download for Windows
+              <span class="btn__arrow" aria-hidden="true"><svg class="ic"><use href="#i-arrow" /></svg></span>
             </a>
             <a class="btn btn--ghost" href="#top" data-magnetic>Read the notes</a>
           </div>
         </div>
-        <p class="cta__scroll reveal" data-parallax="-0.08" aria-hidden="true">
-          ShutterProof
-        </p>
+        <p class="cta__scroll reveal" data-parallax="-0.08" aria-hidden="true">ShutterProof</p>
       </section>
     </main>
 
@@ -269,37 +581,57 @@
           <span class="label">(Pages)</span>
           <div class="footer__links">
             <a href="#features">Features</a>
-            <a href="#privacy">Privacy</a>
             <a href="#how">How it works</a>
-            <a href="#download">Download</a>
+            <a href="#privacy">Privacy</a>
+            <a href="#pricing">Pricing</a>
           </div>
         </div>
         <div class="footer__col reveal" data-delay="3">
           <span class="label">(Cookies)</span>
           <p class="footer__note">
-            This site tracks nothing by default. No analytics unless you opt in.
+            This site uses <strong>47 cookies</strong>. Just kidding — it uses zero.
+            No analytics, no tracking.
           </p>
         </div>
       </div>
 
       <div class="footer__big" aria-hidden="true">ShutterProof</div>
 
+      <div class="footer__parody">
+        <svg class="ic"><use href="#i-heart" /></svg>
+        <p>
+          <strong>Parody notice.</strong> A deliberately excessive satire of
+          vibe-coded landing pages. All names, quotes, prices, statistics and
+          badges are fictional and exist for humour only. The only accurate claims
+          here concern the real local-first app: on-device records, a local Ollama
+          model, and no cloud, account or telemetry.
+        </p>
+      </div>
+
       <div class="footer__base">
-        <span>© <span data-year>2026</span> ShutterProof</span>
+        <span>© <span data-year>2026</span> ShutterProof · fabricated with care</span>
         <a href="#top">Back to top ↑</a>
       </div>
     </footer>
 
     <div class="cookie" id="cookie" hidden>
       <p>
-        <span class="label">(Cookies)</span> This site uses no analytics. Just
-        the essentials to show the page.
+        <span class="label">(Cookies — parody)</span> We use 47 cookies, several
+        fonts, and a profound sense of urgency. In reality: zero analytics.
       </p>
       <div class="cookie__actions">
         <button type="button" data-cookie="decline">Decline</button>
-        <button type="button" data-cookie="accept" class="is-primary">Accept</button>
+        <button type="button" data-cookie="accept" class="is-primary">Accept all 🍪</button>
       </div>
     </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <noscript>
+      <style>
+        .boot { display: none !important; }
+      </style>
+    </noscript>
 
     <script src="./main.js" defer></script>
   </body>
