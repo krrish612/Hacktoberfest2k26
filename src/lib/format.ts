@@ -1,19 +1,35 @@
-const moneyFormatters = new Map<string, Intl.NumberFormat>();
+const moneyFormatters = new Map<string, (amount: number) => string>();
 
-/** Formats a price for display, or a plain phrase when nothing was recorded. */
-export function formatMoney(amount: number | null, currency: string | null): string {
-  if (amount === null) return "Not recorded";
-  const code = currency ?? "USD";
-  let formatter = moneyFormatters.get(code);
-  if (!formatter) {
-    formatter = new Intl.NumberFormat(undefined, {
+/**
+ * Builds a price formatter for `code`. An unknown or short currency code is
+ * never an error: `Intl.NumberFormat` rejects those outright, so they fall back
+ * to a plain number with the code written after it.
+ */
+function buildFormatter(code: string): (amount: number) => string {
+  try {
+    const style = new Intl.NumberFormat(undefined, {
       style: "currency",
       currency: code,
       maximumFractionDigits: 2,
     });
+    return (amount) => style.format(amount);
+  } catch {
+    const plain = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
+    return (amount) => `${plain.format(amount)} ${code}`;
+  }
+}
+
+/** Formats a price for display, or a plain phrase when nothing was recorded. */
+export function formatMoney(amount: number | null, currency: string | null): string {
+  if (amount === null) return "Not recorded";
+  const trimmed = currency?.trim().toUpperCase() ?? "";
+  const code = trimmed || "USD";
+  let formatter = moneyFormatters.get(code);
+  if (!formatter) {
+    formatter = buildFormatter(code);
     moneyFormatters.set(code, formatter);
   }
-  return formatter.format(amount);
+  return formatter(amount);
 }
 
 /** Formats an ISO `yyyy-mm-dd` date for display, or a plain phrase when absent. */
@@ -30,14 +46,15 @@ export function formatDate(iso: string | null): string {
 
 /**
  * Masks all but the last four characters of a serial number so the full
- * identifier is never shown on screen. Groups of four keep it readable.
+ * identifier is never shown on screen. A serial with four or fewer characters
+ * is masked entirely; groups of four keep longer ones readable.
  */
 export function maskSerial(serial: string | null): string {
   if (!serial) return "Not recorded";
   const compact = serial.replace(/\s+/g, "");
-  if (compact.length <= 4) return compact;
-  const visible = compact.slice(-4);
-  const hidden = "•".repeat(compact.length - 4);
+  if (!compact) return "Not recorded";
+  const visible = compact.length > 4 ? compact.slice(-4) : "";
+  const hidden = "•".repeat(compact.length - visible.length);
   return `${hidden}${visible}`.replace(/(.{4})/g, "$1 ").trim();
 }
 
