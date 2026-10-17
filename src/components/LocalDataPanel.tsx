@@ -7,6 +7,8 @@ interface LocalDataPanelProps {
   status: DataStatus | null;
   runningInTauri: boolean;
   busy: boolean;
+  /** A failed backup or restore, shown here because a toast sits behind the sheet. */
+  error?: string | null;
   onBackup: () => void;
   onRestore: () => void;
   onClose: () => void;
@@ -16,6 +18,7 @@ export function LocalDataPanel({
   status,
   runningInTauri,
   busy,
+  error = null,
   onBackup,
   onRestore,
   onClose,
@@ -88,6 +91,12 @@ export function LocalDataPanel({
           </p>
         )}
       </div>
+
+      {error ? (
+        <div className="sheet__group">
+          <p className="form__error">{error}</p>
+        </div>
+      ) : null}
 
       <div className="sheet__foot">
         <p className="sheet__note">

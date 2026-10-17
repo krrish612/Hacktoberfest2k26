@@ -1,4 +1,5 @@
 import type { Evidence, EvidenceKind, Gear, TimelineEvent, TimelineEventInput, WarrantyView } from "../types";
+import type { ActionResult } from "../state/RecordsProvider";
 import { formatMoney, maskSerial } from "../lib/format";
 import { warrantyView } from "../lib/warranty";
 import { DetailList } from "./DetailList";
@@ -28,7 +29,7 @@ interface GearPassportProps {
   onDelete: () => void;
   onAttach: (kind: EvidenceKind) => void;
   onRemoveEvidence: (id: string) => void;
-  onAddEvent: (input: TimelineEventInput) => Promise<boolean>;
+  onAddEvent: (input: TimelineEventInput) => Promise<ActionResult>;
   onRemoveEvent: (id: string) => void;
 }
 

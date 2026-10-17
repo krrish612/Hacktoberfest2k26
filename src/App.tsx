@@ -10,6 +10,7 @@ import { Toast } from "./components/Toast";
 import { fetchAppInfo } from "./lib/tauri";
 import type { AppInfo, Gear, GearInput } from "./types";
 import { RecordsProvider, useRecords } from "./state/RecordsProvider";
+import type { ActionResult } from "./state/RecordsProvider";
 
 export function App() {
   return (
@@ -65,6 +66,7 @@ function Workspace() {
   const [editorPreset, setEditorPreset] = useState<Partial<GearInput> | null>(null);
   const [confirm, setConfirm] = useState<Confirm>(null);
   const [showData, setShowData] = useState(false);
+  const [dataError, setDataError] = useState<string | null>(null);
   const [reading, setReading] = useState(false);
 
   const openEditor = (target: Gear | "new", preset: Partial<GearInput> | null = null) => {
@@ -87,14 +89,31 @@ function Workspace() {
     setEditorPreset(null);
   };
 
-  const submitEditor = async (input: GearInput) => {
-    const ok =
+  const openData = () => {
+    setDataError(null);
+    setShowData(true);
+  };
+
+  const closeData = () => {
+    setDataError(null);
+    setShowData(false);
+  };
+
+  const recordResult = (result: ActionResult) => {
+    setDataError(result.ok ? null : result.error);
+  };
+
+  const submitEditor = async (input: GearInput): Promise<string | null> => {
+    if (!editor) return null;
+    const result =
       editor === "new"
         ? await records.createGear(input)
-        : editor
-          ? await records.updateGear(editor.id, input)
-          : false;
-    if (ok) closeEditor();
+        : await records.updateGear(editor.id, input);
+    if (result.ok) {
+      closeEditor();
+      return null;
+    }
+    return result.error ?? "Something went wrong. Please try again.";
   };
 
   const count = records.gears.length;
@@ -138,7 +157,7 @@ function Workspace() {
         hint={hint}
         actions={
           <>
-            <button type="button" className="btn btn--small" onClick={() => setShowData(true)}>
+            <button type="button" className="btn btn--small" onClick={openData}>
               <Icon name="lock" size={15} />
               Local data
             </button>
@@ -198,7 +217,12 @@ function Workspace() {
           message="Your current records and attached files will be replaced by the backup folder you choose next."
           confirmLabel="Choose folder and restore"
           busy={Boolean(records.busy)}
-          onConfirm={() => records.restore().then(() => setConfirm(null))}
+          onConfirm={() =>
+            records.restore().then((result) => {
+              recordResult(result);
+              setConfirm(null);
+            })
+          }
           onCancel={() => setConfirm(null)}
         />
       ) : null}
@@ -208,9 +232,10 @@ function Workspace() {
           status={records.status}
           runningInTauri={records.runningInTauri}
           busy={Boolean(records.busy)}
-          onBackup={() => void records.backup()}
+          error={dataError}
+          onBackup={() => void records.backup().then(recordResult)}
           onRestore={() => setConfirm("restore")}
-          onClose={() => setShowData(false)}
+          onClose={closeData}
         />
       ) : null}
 

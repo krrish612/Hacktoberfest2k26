@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import type { TimelineEvent, TimelineEventInput, TimelineEventKind } from "../types";
+import type { ActionResult } from "../state/RecordsProvider";
 import { formatDate } from "../lib/format";
 import type { IconName } from "./Icon";
 import { Icon } from "./Icon";
@@ -28,7 +29,7 @@ const kindLabels: [TimelineEventKind, string][] = [
 interface OwnershipTimelineProps {
   events: TimelineEvent[];
   busy: boolean;
-  onAdd: (input: TimelineEventInput) => Promise<boolean>;
+  onAdd: (input: TimelineEventInput) => Promise<ActionResult>;
   onRemove: (id: string) => void;
 }
 
@@ -40,8 +41,8 @@ export function OwnershipTimeline({ events, busy, onAdd, onRemove }: OwnershipTi
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const ok = await onAdd({ kind, occurredOn, title, detail: detail || null });
-    if (ok) {
+    const result = await onAdd({ kind, occurredOn, title, detail: detail || null });
+    if (result.ok) {
       setOccurredOn("");
       setTitle("");
       setDetail("");

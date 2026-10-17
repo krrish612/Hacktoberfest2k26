@@ -88,7 +88,12 @@ interface GearEditorProps {
   preset?: Partial<GearInput> | null;
   busy: boolean;
   onClose: () => void;
-  onSubmit: (input: GearInput) => void;
+  /**
+   * Saves the record and resolves with the failure to show in this sheet, or
+   * `null` on success so the sheet can close. Failures have to surface here:
+   * a toast sits behind a modal `<dialog>` and cannot be seen.
+   */
+  onSubmit: (input: GearInput) => Promise<string | null>;
 }
 
 export function GearEditor({ gear, preset = null, busy, onClose, onSubmit }: GearEditorProps) {
@@ -107,7 +112,7 @@ export function GearEditor({ gear, preset = null, busy, onClose, onSubmit }: Gea
     if (event.target === dialogRef.current && !busy) onClose();
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const problem = validate(form);
     if (problem) {
@@ -115,7 +120,8 @@ export function GearEditor({ gear, preset = null, busy, onClose, onSubmit }: Gea
       return;
     }
     setError(null);
-    onSubmit(toInput(form));
+    const failure = await onSubmit(toInput(form));
+    if (failure) setError(failure);
   };
 
   const title = gear ? "Edit gear record" : "New gear record";

@@ -24,6 +24,15 @@ export interface Notice {
   message: string;
 }
 
+/**
+ * The outcome of a record change. Dialogs use `error` to show the failure
+ * themselves: a toast alone sits behind a modal `<dialog>` and cannot be seen.
+ */
+export interface ActionResult {
+  ok: boolean;
+  error: string | null;
+}
+
 interface RecordsValue {
   gears: Gear[];
   selectedId: string | null;
@@ -39,15 +48,15 @@ interface RecordsValue {
   runningInTauri: boolean;
   select: (id: string) => void;
   refresh: () => Promise<void>;
-  createGear: (input: GearInput) => Promise<boolean>;
-  updateGear: (id: string, input: GearInput) => Promise<boolean>;
-  deleteGear: (id: string) => Promise<boolean>;
-  attachEvidence: (kind: EvidenceKind) => Promise<boolean>;
-  removeEvidence: (id: string) => Promise<boolean>;
-  addEvent: (input: TimelineEventInput) => Promise<boolean>;
-  removeEvent: (id: string) => Promise<boolean>;
-  backup: () => Promise<boolean>;
-  restore: () => Promise<boolean>;
+  createGear: (input: GearInput) => Promise<ActionResult>;
+  updateGear: (id: string, input: GearInput) => Promise<ActionResult>;
+  deleteGear: (id: string) => Promise<ActionResult>;
+  attachEvidence: (kind: EvidenceKind) => Promise<ActionResult>;
+  removeEvidence: (id: string) => Promise<ActionResult>;
+  addEvent: (input: TimelineEventInput) => Promise<ActionResult>;
+  removeEvent: (id: string) => Promise<ActionResult>;
+  backup: () => Promise<ActionResult>;
+  restore: () => Promise<ActionResult>;
   dismissNotice: () => void;
   clearError: () => void;
 }
@@ -141,19 +150,23 @@ export function RecordsProvider({ children }: { children: ReactNode }) {
     };
   }, [selectedId]);
 
-  const action = useCallback(async (label: string, task: () => Promise<string | void>): Promise<boolean> => {
-    setBusy(label);
-    try {
-      const message = await task();
-      if (typeof message === "string" && message) setNotice({ tone: "success", message });
-      return true;
-    } catch (caught) {
-      setNotice({ tone: "error", message: messageOf(caught) });
-      return false;
-    } finally {
-      setBusy(null);
-    }
-  }, []);
+  const action = useCallback(
+    async (label: string, task: () => Promise<string | void>): Promise<ActionResult> => {
+      setBusy(label);
+      try {
+        const message = await task();
+        if (typeof message === "string" && message) setNotice({ tone: "success", message });
+        return { ok: true, error: null };
+      } catch (caught) {
+        const message = messageOf(caught);
+        setNotice({ tone: "error", message });
+        return { ok: false, error: message };
+      } finally {
+        setBusy(null);
+      }
+    },
+    [],
+  );
 
   const syncStatus = useCallback(async () => {
     setStatus(await api.recordsStatus());
