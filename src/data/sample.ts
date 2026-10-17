@@ -55,9 +55,11 @@ export const gears: Gear[] = [
     seller: "B&H Photo Video",
     warrantyStart: "2026-08-30",
     warrantyEnd: "2026-10-30",
-    warrantyConfirmed: false,
+    // Warranty dates are only ever stored alongside a confirmation (the backend
+    // rejects unconfirmed dates), so the sample record has to agree.
+    warrantyConfirmed: true,
     warrantyTerms: "60-day store replacement cover from the seller.",
-    notes: "Second light for receptions. Needs a warranty decision this month.",
+    notes: "Second light for receptions. Store cover ends 30 Oct; decide on an extension before then.",
     createdAt: "2026-08-30T13:48:00.000Z",
     updatedAt: "2026-08-30T13:48:00.000Z",
   },
