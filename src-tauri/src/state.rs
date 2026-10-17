@@ -10,7 +10,7 @@ use rusqlite::Connection;
 use tauri::{AppHandle, Manager};
 
 use crate::error::{AppError, AppResult};
-use crate::{db, files};
+use crate::{backup, db, files};
 
 pub struct AppState {
     db: Mutex<Option<Connection>>,
@@ -38,6 +38,7 @@ impl AppState {
         std::fs::create_dir_all(&default_backup_dir)?;
 
         files::sweep_temp(&temp_dir);
+        backup::sweep_staging(&data_dir);
 
         let connection = db::open(&db_path)?;
         db::migrate(&connection)?;

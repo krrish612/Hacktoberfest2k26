@@ -28,10 +28,6 @@ where
         .map_err(|error| AppError::internal(error.to_string()))?
 }
 
-fn lock_error() -> AppError {
-    AppError::internal("The records database is busy.")
-}
-
 fn timestamp() -> String {
     chrono::Utc::now().to_rfc3339()
 }
@@ -202,17 +198,29 @@ pub async fn records_status(state: State<'_, Shared>) -> AppResult<DataStatus> {
 #[tauri::command]
 pub async fn backup_records(state: State<'_, Shared>, dest_dir: String) -> AppResult<BackupInfo> {
     run(&state, move |shared| {
+        let dest = Path::new(&dest_dir).to_path_buf();
+        // Snapshot under the connection lock so the copy is a consistent
+        // point-in-time database, never a file another command is mid-write in.
+        // VACUUM INTO writes a fresh, self-contained database with no sidecars.
+        let snapshot = shared
+            .temp_dir
+            .join(format!("backup-snapshot-{}.db", uuid::Uuid::new_v4()));
         let counts = shared.with_conn(|conn| {
-            let _ = conn.query_row("PRAGMA wal_checkpoint(TRUNCATE)", [], |_row| Ok(()));
+            conn.execute("VACUUM INTO ?1", [snapshot.to_string_lossy().as_ref()])
+                .map_err(|error| {
+                    AppError::internal(format!("could not snapshot the records database: {error}"))
+                })?;
             db::counts(conn)
         })?;
-        backup::create_backup(
-            &shared.db_path,
+        let result = backup::create_backup(
+            &snapshot,
             &shared.evidence_dir,
-            Path::new(&dest_dir),
+            &dest,
             counts,
             env!("CARGO_PKG_VERSION"),
-        )
+        );
+        let _ = std::fs::remove_file(&snapshot);
+        result
     })
     .await
 }
@@ -325,19 +333,14 @@ pub async fn export_repair_packet(
 #[tauri::command]
 pub async fn restore_records(state: State<'_, Shared>, backup_dir: String) -> AppResult<()> {
     run(&state, move |shared| {
+        // stage_restore verifies the incoming database before anything is
+        // touched; apply_restore rolls back internally if the swap fails, so
+        // reopening always lands on a coherent store.
         let staged = backup::stage_restore(Path::new(&backup_dir), &shared.data_dir)?;
         shared.close_db()?;
-        match backup::apply_restore(staged, &shared.db_path, &shared.evidence_dir) {
-            Ok(()) => shared.reopen_db(),
-            Err(error) => {
-                let previous = shared.db_path.with_extension("db.previous");
-                if !shared.db_path.exists() && previous.exists() {
-                    let _ = std::fs::rename(&previous, &shared.db_path);
-                }
-                let _ = shared.reopen_db().map_err(|_| lock_error());
-                Err(error)
-            }
-        }
+        let restored = backup::apply_restore(staged, &shared.db_path, &shared.evidence_dir);
+        let reopened = shared.reopen_db();
+        restored.and(reopened)
     })
     .await
 }
