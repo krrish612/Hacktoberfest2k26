@@ -298,6 +298,10 @@ pub fn insert_timeline(
     chrono::NaiveDate::parse_from_str(occurred_on, "%Y-%m-%d")
         .map_err(|_| AppError::validation("The event date must look like 2026-10-14."))?;
 
+    // Confirm the gear this event belongs to still exists, so a stale screen
+    // gets a plain explanation instead of a raw foreign-key error.
+    get_gear(conn, gear_id)?;
+
     let event = TimelineEvent {
         id: Uuid::new_v4().to_string(),
         gear_id: gear_id.to_string(),
@@ -340,4 +344,64 @@ pub fn counts(conn: &Connection) -> AppResult<(i64, i64)> {
     let gear: i64 = conn.query_row("SELECT COUNT(*) FROM gear", [], |row| row.get(0))?;
     let evidence: i64 = conn.query_row("SELECT COUNT(*) FROM evidence", [], |row| row.get(0))?;
     Ok((gear, evidence))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn memory() -> Connection {
+        let conn = Connection::open_in_memory().unwrap();
+        migrate(&conn).unwrap();
+        conn
+    }
+
+    fn gear_input() -> GearInput {
+        GearInput {
+            name: "Canon EOS R6 Mark II".into(),
+            category: "Camera body".into(),
+            brand: None,
+            model: None,
+            serial_number: None,
+            purchase_date: None,
+            purchase_price: None,
+            currency: None,
+            seller: None,
+            warranty_start: None,
+            warranty_end: None,
+            warranty_confirmed: false,
+            warranty_terms: None,
+            notes: None,
+        }
+    }
+
+    fn note_input() -> TimelineEventInput {
+        TimelineEventInput {
+            kind: "note".into(),
+            occurred_on: "2026-10-14".into(),
+            title: "Sensor cleaned".into(),
+            detail: None,
+        }
+    }
+
+    #[test]
+    fn timeline_for_a_missing_gear_reports_plainly() {
+        let conn = memory();
+        let error = insert_timeline(&conn, "missing-gear", &note_input()).unwrap_err();
+        let message = error.to_string();
+        assert!(message.contains("no longer exists"), "got: {message}");
+        assert!(
+            !message.to_lowercase().contains("constraint"),
+            "raw database error leaked: {message}"
+        );
+    }
+
+    #[test]
+    fn timeline_is_recorded_for_an_existing_gear() {
+        let conn = memory();
+        let gear = insert_gear(&conn, gear_input()).unwrap();
+        let event = insert_timeline(&conn, &gear.id, &note_input()).unwrap();
+        assert_eq!(event.gear_id, gear.id);
+        assert_eq!(list_timeline(&conn, &gear.id).unwrap().len(), 1);
+    }
 }
