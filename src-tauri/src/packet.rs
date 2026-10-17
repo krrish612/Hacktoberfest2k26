@@ -98,24 +98,29 @@ pub fn select_owned<T: Clone>(
         .collect())
 }
 
-/// Shows all but the last four characters of a serial number.
+/// Shows all but the last four characters of a serial number. A serial too short
+/// to have four hidden characters is masked entirely, so no fragment leaks.
 fn masked_serial(raw: &str) -> String {
     let compact: String = raw.chars().filter(|c| !c.is_whitespace()).collect();
     let count = compact.chars().count();
     if count <= 4 {
-        return compact;
+        return "•".repeat(count);
     }
     let visible: String = compact.chars().skip(count - 4).collect();
     format!("{}{}", "•".repeat(count - 4), visible)
 }
 
+/// Returns a record field's trimmed text, or a plain phrase when absent. The
+/// value is returned raw; `row` escapes it where it is placed.
 fn text(value: &Option<String>) -> String {
     match value {
-        Some(raw) if !raw.trim().is_empty() => escape_html(raw.trim()),
+        Some(raw) if !raw.trim().is_empty() => raw.trim().to_string(),
         _ => "Not recorded".to_string(),
     }
 }
 
+/// Formats a price with its currency. The value is returned raw; `row` escapes
+/// it where it is placed.
 fn price(amount: Option<f64>, currency: &Option<String>) -> String {
     match amount {
         None => "Not recorded".to_string(),
@@ -126,9 +131,7 @@ fn price(amount: Option<f64>, currency: &Option<String>) -> String {
                 format!("{value:.2}")
             };
             match currency {
-                Some(code) if !code.trim().is_empty() => {
-                    format!("{money} {}", escape_html(code.trim()))
-                }
+                Some(code) if !code.trim().is_empty() => format!("{money} {}", code.trim()),
                 _ => money,
             }
         }
@@ -216,14 +219,19 @@ fn kind_label(kind: &str) -> &'static str {
     }
 }
 
+/// Builds one table row. Both the label and the value are escaped here, so every
+/// caller passes the raw record text and cannot forget to encode it.
 fn row(label: &str, value: &str) -> String {
     format!(
         "<tr><th scope=\"row\">{}</th><td>{}</td></tr>",
         escape_html(label),
-        value
+        escape_html(value)
     )
 }
 
+/// Joins already-built list items into a list, or a plain phrase when there are
+/// none. Items may carry the small `<span class="meta">` markup the report uses;
+/// every record value inside them is escaped before the item is built.
 fn list_items(items: &[String], empty: &str) -> String {
     if items.is_empty() {
         return format!("<p class=\"empty\">{}</p>", escape_html(empty));
@@ -250,7 +258,7 @@ pub fn summary_html(
         text(&gear.serial_number)
     } else {
         match &gear.serial_number {
-            Some(raw) if !raw.trim().is_empty() => escape_html(&masked_serial(raw)),
+            Some(raw) if !raw.trim().is_empty() => masked_serial(raw),
             _ => "Not recorded".to_string(),
         }
     };
@@ -263,7 +271,7 @@ pub fn summary_html(
     let identity = [
         row("Brand", &text(&gear.brand)),
         row("Model", &text(&gear.model)),
-        row("Category", &escape_html(&gear.category)),
+        row("Category", &gear.category),
         row("Serial number", &serial),
     ]
     .join("");
@@ -561,6 +569,27 @@ mod tests {
 
         let full = summary_html(&gear(), &[], &[], true);
         assert!(full.contains("SN-1234-5678"));
+    }
+
+    #[test]
+    fn fully_masks_a_serial_too_short_to_hide_four() {
+        let mut item = gear();
+        item.serial_number = Some("ABC".into());
+        let html = summary_html(&item, &[], &[], false);
+        assert!(html.contains("<td>•••</td>"));
+        assert!(!html.contains("ABC"));
+    }
+
+    #[test]
+    fn escapes_table_values_not_just_labels() {
+        let mut item = gear();
+        item.seller = Some("Shop <b> & Co".into());
+        item.currency = Some("US\"D".into());
+        let html = summary_html(&item, &[], &[], false);
+        assert!(html.contains("Shop &lt;b&gt; &amp; Co"));
+        assert!(!html.contains("Shop <b>"));
+        assert!(html.contains("US&quot;D"));
+        assert!(!html.contains("US\"D"));
     }
 
     #[test]
