@@ -26,6 +26,11 @@ export function ExtractDialog({ gearId, onClose, onApply }: ExtractDialogProps) 
   const [phase, setPhase] = useState<Phase>("checking");
   const [result, setResult] = useState<Extraction | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // The native file picker is async, so the sheet has to go busy *before* it
+  // opens; otherwise the sheet stays closable and the button stays clickable
+  // while the picker is up.
+  const [picking, setPicking] = useState(false);
+  const pickingRef = useRef(false);
 
   useEffect(() => {
     dialogRef.current?.showModal();
@@ -48,6 +53,9 @@ export function ExtractDialog({ gearId, onClose, onApply }: ExtractDialogProps) 
   }, [checkModel]);
 
   const chooseAndRead = useCallback(async () => {
+    if (pickingRef.current) return;
+    pickingRef.current = true;
+    setPicking(true);
     setError(null);
     try {
       const source = await pickEvidenceFile("Choose a receipt to read");
@@ -58,11 +66,17 @@ export function ExtractDialog({ gearId, onClose, onApply }: ExtractDialogProps) 
     } catch (caught) {
       setError(messageOf(caught));
       setPhase("error");
+    } finally {
+      pickingRef.current = false;
+      setPicking(false);
     }
   }, [gearId]);
 
+  /** Blocks closing while the picker or the model is working. */
+  const busy = picking || phase === "reading";
+
   const onBackdropClick = (event: MouseEvent<HTMLDialogElement>) => {
-    if (event.target === dialogRef.current && phase !== "reading") onClose();
+    if (event.target === dialogRef.current && !busy) onClose();
   };
 
   const ready = phase === "ready" && status?.available === true && status.modelPresent;
@@ -75,7 +89,7 @@ export function ExtractDialog({ gearId, onClose, onApply }: ExtractDialogProps) 
       aria-labelledby="extract-title"
       onCancel={(event) => {
         event.preventDefault();
-        if (phase !== "reading") onClose();
+        if (!busy) onClose();
       }}
       onClick={onBackdropClick}
     >
@@ -91,7 +105,7 @@ export function ExtractDialog({ gearId, onClose, onApply }: ExtractDialogProps) 
           className="sheet__close"
           onClick={onClose}
           aria-label="Close"
-          disabled={phase === "reading"}
+          disabled={busy}
         >
           <Icon name="close" size={18} />
         </button>
@@ -109,7 +123,12 @@ export function ExtractDialog({ gearId, onClose, onApply }: ExtractDialogProps) 
             <div className="model__meta">
               <span className="mono">{modelName}</span>
               {status.version ? <span>Ollama {status.version}</span> : null}
-              <button type="button" className="btn btn--small btn--quiet" onClick={() => void checkModel()}>
+              <button
+                type="button"
+                className="btn btn--small btn--quiet"
+                onClick={() => void checkModel()}
+                disabled={busy}
+              >
                 Check again
               </button>
             </div>
@@ -133,7 +152,12 @@ export function ExtractDialog({ gearId, onClose, onApply }: ExtractDialogProps) 
         ) : null}
 
         {ready ? (
-          <button type="button" className="btn btn--primary" onClick={() => void chooseAndRead()}>
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={() => void chooseAndRead()}
+            disabled={picking}
+          >
             <Icon name="receipt" size={15} />
             Choose a receipt file
           </button>
@@ -182,14 +206,19 @@ export function ExtractDialog({ gearId, onClose, onApply }: ExtractDialogProps) 
             </p>
 
             <div className="form__actions">
-              <button type="button" className="btn" onClick={() => void chooseAndRead()}>
+              <button
+                type="button"
+                className="btn"
+                onClick={() => void chooseAndRead()}
+                disabled={picking}
+              >
                 Choose another
               </button>
               <button
                 type="button"
                 className="btn btn--primary"
                 onClick={() => onApply(presetFromExtraction(result))}
-                disabled={result.fields.length === 0}
+                disabled={result.fields.length === 0 || picking}
               >
                 Review in editor
               </button>

@@ -57,6 +57,10 @@ export function PrepareRepairPacket({ gear, evidence, events }: PrepareRepairPac
   const [phase, setPhase] = useState<Phase>("review");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PacketInfo | null>(null);
+  // The save dialog is async: the sheet has to go busy before it opens so it
+  // cannot be closed or re-triggered while the picker is up.
+  const [picking, setPicking] = useState(false);
+  const pickingRef = useRef(false);
 
   const selectedEvidence = useMemo(
     () => evidence.filter((item) => !excludedEvidence.has(item.id)),
@@ -68,6 +72,7 @@ export function PrepareRepairPacket({ gear, evidence, events }: PrepareRepairPac
   );
 
   const busy = phase === "saving";
+  const blocked = busy || picking;
   const nothingSelected = selectedEvidence.length === 0 && selectedEvents.length === 0;
 
   const open = () => {
@@ -81,7 +86,7 @@ export function PrepareRepairPacket({ gear, evidence, events }: PrepareRepairPac
   };
 
   const close = () => {
-    if (!busy) dialogRef.current?.close();
+    if (!blocked) dialogRef.current?.close();
   };
 
   const toggle = (
@@ -97,11 +102,15 @@ export function PrepareRepairPacket({ gear, evidence, events }: PrepareRepairPac
   };
 
   const save = async () => {
+    if (pickingRef.current || blocked) return;
     setError(null);
-    const dest = await pickSaveZip(`repair-packet-${slug(gear.model ?? gear.name)}.zip`);
-    if (!dest) return;
-    setPhase("saving");
+    pickingRef.current = true;
+    setPicking(true);
     try {
+      const dest = await pickSaveZip(`repair-packet-${slug(gear.model ?? gear.name)}.zip`);
+      if (!dest) return;
+      setPicking(false);
+      setPhase("saving");
       const info = await api.exportRepairPacket(
         gear.id,
         selectedEvidence.map((item) => item.id),
@@ -114,6 +123,9 @@ export function PrepareRepairPacket({ gear, evidence, events }: PrepareRepairPac
     } catch (caught) {
       setError(messageOf(caught));
       setPhase("error");
+    } finally {
+      pickingRef.current = false;
+      setPicking(false);
     }
   };
 
@@ -150,7 +162,7 @@ export function PrepareRepairPacket({ gear, evidence, events }: PrepareRepairPac
             className="sheet__close"
             onClick={close}
             aria-label="Close"
-            disabled={busy}
+            disabled={blocked}
           >
             <Icon name="close" size={18} />
           </button>
@@ -210,7 +222,7 @@ export function PrepareRepairPacket({ gear, evidence, events }: PrepareRepairPac
                     <input
                       type="checkbox"
                       checked={includeSerial}
-                      disabled={busy}
+                      disabled={blocked}
                       onChange={(event) => setIncludeSerial(event.target.checked)}
                     />
                     <span>Include the full serial number</span>
@@ -267,7 +279,7 @@ export function PrepareRepairPacket({ gear, evidence, events }: PrepareRepairPac
                         <input
                           type="checkbox"
                           checked={!excludedEvidence.has(item.id)}
-                          disabled={busy}
+                          disabled={blocked}
                           onChange={() => toggle(item.id, setExcludedEvidence)}
                         />
                         <span>{item.originalName}</span>
@@ -289,7 +301,7 @@ export function PrepareRepairPacket({ gear, evidence, events }: PrepareRepairPac
                         <input
                           type="checkbox"
                           checked={!excludedEvents.has(event.id)}
-                          disabled={busy}
+                          disabled={blocked}
                           onChange={() => toggle(event.id, setExcludedEvents)}
                         />
                         <span>{event.title}</span>
@@ -326,10 +338,10 @@ export function PrepareRepairPacket({ gear, evidence, events }: PrepareRepairPac
                 type="button"
                 className="btn btn--primary"
                 onClick={() => void save()}
-                disabled={busy || nothingSelected || !runningInTauri}
+                disabled={blocked || nothingSelected || !runningInTauri}
               >
                 <Icon name="package" size={15} />
-                {busy ? "Writing the packet…" : "Save packet…"}
+                {busy ? "Writing the packet…" : picking ? "Opening a save dialog…" : "Save packet…"}
               </button>
             </>
           )}
