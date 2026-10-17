@@ -35,5 +35,7 @@ pdf-extract = "0.9"
 codegen-units = 1
 lto = true
 opt-level = "s"
-panic = "abort"
+# Unwind so a panic inside a third-party PDF parser can be caught and reported
+# as an ordinary error instead of aborting the app (see document::pdf_text).
+panic = "unwind"
 strip = true

@@ -51,9 +51,30 @@ pub fn read(path: &Path) -> AppResult<Document> {
 }
 
 fn pdf_text(bytes: &[u8]) -> AppResult<String> {
-    let text = pdf_extract::extract_text_from_mem(bytes)
-        .map_err(|_| AppError::validation("That PDF could not be read."))?;
+    let text = guard_extraction(|| {
+        pdf_extract::extract_text_from_mem(bytes)
+            .map_err(|_| AppError::validation("That PDF could not be read."))
+    })?;
+    normalize_text(text)
+}
 
+/// Runs one PDF text extraction and turns a panic inside the parser into an
+/// ordinary error. A malformed or hostile file must never take down the app.
+fn guard_extraction<F>(extract: F) -> AppResult<String>
+where
+    F: FnOnce() -> AppResult<String>,
+{
+    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(extract)) {
+        Ok(result) => result,
+        Err(_) => Err(AppError::validation(
+            "That PDF could not be read. Try a photo of the receipt instead.",
+        )),
+    }
+}
+
+/// Trims the extracted text, rejects a scan with no text layer, and caps how
+/// much of a runaway PDF is handed to the model.
+fn normalize_text(text: String) -> AppResult<String> {
     let trimmed = text.trim();
     if trimmed.is_empty() {
         return Err(AppError::validation(
@@ -65,4 +86,39 @@ fn pdf_text(bytes: &[u8]) -> AppResult<String> {
         return Ok(trimmed.chars().take(MAX_TEXT_CHARS).collect());
     }
     Ok(trimmed.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_panicking_parser_is_reported_not_propagated() {
+        let result = guard_extraction(|| panic!("boom inside the parser"));
+        let message = result.unwrap_err().to_string();
+        assert!(message.contains("could not be read"), "got: {message}");
+    }
+
+    #[test]
+    fn a_parser_error_is_reported() {
+        let result = guard_extraction(|| Err(AppError::validation("That PDF could not be read.")));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn extracted_text_is_trimmed_and_capped() {
+        assert_eq!(normalize_text("  hello  ".into()).unwrap(), "hello");
+
+        let long = "x".repeat(MAX_TEXT_CHARS + 50);
+        assert_eq!(
+            normalize_text(long).unwrap().chars().count(),
+            MAX_TEXT_CHARS
+        );
+    }
+
+    #[test]
+    fn a_pdf_without_a_text_layer_is_a_scan() {
+        let error = normalize_text("   ".into()).unwrap_err().to_string();
+        assert!(error.contains("scan"), "got: {error}");
+    }
 }
