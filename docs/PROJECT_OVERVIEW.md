@@ -64,6 +64,7 @@ shutterproof/
       dialog.ts              open/save file dialogs wrapper
       extraction.ts          preset + confidence helpers for receipt fields
       format.ts              money/date/serial formatting helpers
+      format.test.ts         node test-runner checks for the formatters
       warranty.ts            warranty status derivation
       tauri.ts               tauri detection and app info
     state/
@@ -118,6 +119,9 @@ front end never talks to the network itself. it only calls rust commands.
 - why: a single context keeps every component reading the same list, so the ui
   never shows two different versions of the same record. it also centralises
   error handling so a failed command shows a message instead of crashing.
+- key detail: each mutating action resolves to an `ActionResult` (`ok` /
+  `error`) as well as setting the notice. a dialog opened over the page cannot
+  see a toast behind it, so it reads the result and shows the failure inline.
 - depends on: `lib/api.ts`, `types.ts`.
 
 **`src/lib/api.ts`**
@@ -155,7 +159,12 @@ export function warrantyView(gear: Gear, now: Date = new Date()): WarrantyView {
 - what: display helpers for money, dates, byte sizes, and serial numbers.
 - why: keeps formatting in one place so every screen shows values the same way.
 - key detail: `maskSerial` hides all but the last four characters of a serial so
-  a full identifier is never shown on screen.
+  a full identifier is never shown on screen. a serial of four characters or
+  fewer is masked completely.
+- key detail: `formatMoney` falls back to a plain number when a currency code is
+  not understood, so an odd code can never crash a screen.
+- tests: `format.test.ts` runs under `npm test` and covers the fallback and the
+  masking rules.
 
 **`src/lib/extraction.ts`**
 - what: maps a receipt extraction into editor presets and per-field confidence
@@ -171,9 +180,12 @@ export function warrantyView(gear: Gear, now: Date = new Date()): WarrantyView {
 - `OwnershipTimeline.tsx` - the milestone list.
 - `EvidenceTray.tsx` - attached files.
 - `PrepareRepairPacket.tsx` - reviews and exports the repair packet: pick files
-  and history, preview the full serial only after opting in, and save a zip.
-- `ExtractDialog.tsx` - runs receipt reading and shows suggestions for review.
-- `LocalDataPanel.tsx` - shows where data lives and backup actions.
+  and history, preview the full serial only after opting in, and save a zip. it
+  goes busy before the save dialog opens and shows export errors inline.
+- `ExtractDialog.tsx` - runs receipt reading and shows suggestions for review. it
+  goes busy before the file picker opens and shows read errors inline.
+- `LocalDataPanel.tsx` - shows where data lives and backup actions, and reports a
+  failed backup or restore inside the panel.
 - `Section.tsx`, `DetailList.tsx`, `Icon.tsx` - small shared pieces.
 - `ConfirmDialog.tsx`, `Toast.tsx` - confirmation and feedback.
 - why: each piece owns one job, so a screen is a short list of named parts
@@ -199,6 +211,8 @@ export function warrantyView(gear: Gear, now: Date = new Date()): WarrantyView {
 - what: opens the sqlite database and runs migrations.
 - why: sqlite keeps the app local-first with a single file and no server. all
   statements are parameterised, foreign keys are on, and wal mode is enabled.
+- key detail: recording a timeline entry for a gear that no longer exists reports
+  a plain "no longer exists" message instead of a raw foreign-key error.
 
 ```rust
 // src-tauri/src/db.rs - safe query shape
@@ -209,6 +223,8 @@ let mut stmt = conn.prepare("select id, name from gear where id = ?1")?;
 - what: stores evidence files on disk and hashes them (sha256).
 - why: files live next to the database rather than inside it, which keeps the
   database small and lets a user copy evidence out without special tools.
+- key detail: a stored name must be a single plain path component, so a lookup or
+  delete can never step outside the evidence folder.
 
 **`src-tauri/src/backup.rs`**
 - what: creates and restores backups of the app data.
@@ -236,11 +252,17 @@ let mut stmt = conn.prepare("select id, name from gear where id = ?1")?;
   packet temp files use unique names and are atomically renamed into place.
   Missing and oversized selected files stop export with a named message; event
   details appear HTML-escaped in the report.
+- key detail: both the label and the value of every report row are HTML-escaped,
+  and a serial of four characters or fewer is masked completely rather than
+  leaving a readable tail.
 
 **`src-tauri/src/document.rs`**
 - what: extracts text from pdf files before any read.
 - why: it checks the file size before reading so an oversized file cannot hang
   or exhaust memory (this was a real fix in commit `0ecd64b`).
+- key detail: extraction runs inside `catch_unwind`, so a parser panic becomes a
+  readable "could not be read" error instead of failing the whole command. the
+  release profile uses `panic = "unwind"` for this to work.
 
 **`src-tauri/src/ollama.rs`**
 - what: the only module that talks to a model. it checks the local server and
@@ -349,6 +371,7 @@ checks:
 ```bash
 npm run typecheck    # tsc --noEmit
 npm run build        # typecheck + vite production build
+npm test             # node --test, formatter unit checks
 npm run lint         # declared but eslint is not configured yet
 ```
 
