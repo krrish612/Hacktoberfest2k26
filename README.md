@@ -245,3 +245,4 @@ are always masked to the last four characters.
 - The repair-packet ZIP writer is **dependency-free** (`src-tauri/src/archive.rs`):
   it writes stored entries and a CRC-32 itself rather than pulling in an archive
   crate, so the feature adds no third-party license and no new dependency.
+  you can see it
