@@ -62,6 +62,7 @@ shutterproof/
       api.ts                 picks the real or memory backend
       memory-api.ts          in-browser backend used outside tauri
       confirm.ts             how a confirm dialog reacts to its action result
+      confirm.test.ts        node test-runner checks for the confirm outcome
       dialog.ts              open/save file dialogs wrapper
       extraction.ts          preset + confidence helpers for receipt fields
       format.ts              money/date/serial formatting helpers
@@ -178,6 +179,8 @@ export function warrantyView(gear: Gear, now: Date = new Date()): WarrantyView {
   next: close on success, or stay open with the message on failure.
 - why: a toast sits behind a modal `<dialog>`, so a failed delete would look like
   it worked. the dialog keeps the reason on screen instead.
+- tests: `confirm.test.ts` runs under `npm test` and covers the close-on-success
+  and stay-open-on-failure cases.
 
 **`src/components/`**
 - `AppShell.tsx` / `Sidebar.tsx` - page frame and navigation.
@@ -195,7 +198,8 @@ export function warrantyView(gear: Gear, now: Date = new Date()): WarrantyView {
   failed backup or restore inside the panel.
 - `Section.tsx`, `DetailList.tsx`, `Icon.tsx` - small shared pieces.
 - `ConfirmDialog.tsx`, `Toast.tsx` - confirmation and feedback. the confirm dialog
-  accepts an `error` so a failed delete stays open and shows the reason inside it.
+  accepts an `error` so a failed delete stays open and shows the reason inside it,
+  decided by `lib/confirm.ts`.
 - why: each piece owns one job, so a screen is a short list of named parts
   instead of one large file.
 

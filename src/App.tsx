@@ -7,6 +7,7 @@ import { GearPassport } from "./components/GearPassport";
 import { Icon } from "./components/Icon";
 import { LocalDataPanel } from "./components/LocalDataPanel";
 import { Toast } from "./components/Toast";
+import { confirmOutcome } from "./lib/confirm";
 import { fetchAppInfo } from "./lib/tauri";
 import type { AppInfo, Gear, GearInput } from "./types";
 import { RecordsProvider, useRecords } from "./state/RecordsProvider";
@@ -222,9 +223,9 @@ function Workspace() {
               return;
             }
             setConfirmError(null);
-            const result = await records.deleteGear(id);
-            if (result.ok) closeConfirm();
-            else setConfirmError(result.error ?? "Something went wrong. Please try again.");
+            const outcome = confirmOutcome(await records.deleteGear(id));
+            if (outcome.close) closeConfirm();
+            else setConfirmError(outcome.error);
           }}
           onCancel={closeConfirm}
         />
