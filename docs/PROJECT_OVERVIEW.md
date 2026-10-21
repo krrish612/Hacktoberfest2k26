@@ -61,6 +61,7 @@ shutterproof/
     lib/
       api.ts                 picks the real or memory backend
       memory-api.ts          in-browser backend used outside tauri
+      confirm.ts             how a confirm dialog reacts to its action result
       dialog.ts              open/save file dialogs wrapper
       extraction.ts          preset + confidence helpers for receipt fields
       format.ts              money/date/serial formatting helpers
@@ -171,6 +172,12 @@ export function warrantyView(gear: Gear, now: Date = new Date()): WarrantyView {
   labels.
 - why: the ui treats model output as suggestions. these helpers decide how a
   suggestion is shown and how confident it looks.
+
+**`src/lib/confirm.ts`**
+- what: `confirmOutcome` turns an action result into what a confirm dialog does
+  next: close on success, or stay open with the message on failure.
+- why: a toast sits behind a modal `<dialog>`, so a failed delete would look like
+  it worked. the dialog keeps the reason on screen instead.
 
 **`src/components/`**
 - `AppShell.tsx` / `Sidebar.tsx` - page frame and navigation.
